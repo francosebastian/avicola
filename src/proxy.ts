@@ -1,22 +1,24 @@
-import { auth } from "@/lib/auth"
+import { getToken } from "next-auth/jwt"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
 const publicRoutes = ["/login", "/api/auth"]
 
-export default auth(async function middleware(req) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
-  const session = req.auth
 
   const isPublic = publicRoutes.some((r) => pathname.startsWith(r))
   if (isPublic) return NextResponse.next()
 
-  if (!session?.user) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+
+  if (!token) {
     const loginUrl = new URL("/login", req.url)
     loginUrl.searchParams.set("callbackUrl", pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  const role = session.user.role
+  const role = token.role as string | undefined
 
   if (role === "admin") {
     return NextResponse.next()
@@ -42,7 +44,7 @@ export default auth(async function middleware(req) {
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|logo.png).*)"],
