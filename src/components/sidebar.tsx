@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession, signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   return (
     <aside className="w-64 bg-sidebar text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0 z-30">
@@ -37,6 +39,7 @@ export function Sidebar() {
           <p className="text-xs text-sidebar-foreground/60">Sistema de Gestión</p>
         </div>
       </div>
+
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
         {navItems.map((item) => (
           <Link
@@ -54,9 +57,26 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="p-4 border-t border-sidebar-muted text-xs text-sidebar-foreground/40">
-        v2.0 — Prototipo
-      </div>
+
+      {session?.user && (
+        <div className="p-3 border-t border-sidebar-muted">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="size-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
+              {(session.user.name ?? "U")[0].toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{session.user.name}</p>
+              <p className="text-xs text-sidebar-foreground/60 capitalize">{session.user.role}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="w-full text-xs text-sidebar-foreground/60 hover:text-sidebar-foreground py-1.5 rounded hover:bg-sidebar-muted transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+      )}
     </aside>
   )
 }
