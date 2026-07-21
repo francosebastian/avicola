@@ -32,18 +32,50 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         pin: { label: "PIN", type: "text" },
       },
       async authorize(credentials) {
-        const { prisma } = await import("@/lib/prisma")
-        const email = credentials?.email as string | undefined
-        const password = credentials?.password as string | undefined
-        const pin = credentials?.pin as string | undefined
+        try {
+          console.log("[AUTH] authorize called", JSON.stringify(credentials))
+          const { prisma } = await import("@/lib/prisma")
+          console.log("[AUTH] prisma loaded")
 
-        if (!email && !pin) return null
+          const email = credentials?.email as string | undefined
+          const password = credentials?.password as string | undefined
+          const pin = credentials?.pin as string | undefined
 
-        if (pin) {
-          const user = await prisma.usuario.findFirst({
-            where: { pin, activo: true },
+          if (!email && !pin) {
+            console.log("[AUTH] no email or pin")
+            return null
+          }
+
+          if (pin) {
+            const user = await prisma.usuario.findFirst({
+              where: { pin, activo: true },
+            })
+            if (!user) {
+              console.log("[AUTH] pin user not found")
+              return null
+            }
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.nombre,
+              role: user.rol,
+              galponId: user.galponId,
+            }
+          }
+
+          if (password !== APP_PASSWORD) {
+            console.log("[AUTH] wrong password")
+            return null
+          }
+
+          const user = await prisma.usuario.findUnique({
+            where: { email },
           })
-          if (!user) return null
+          if (!user || !user.activo) {
+            console.log("[AUTH] user not found or inactive")
+            return null
+          }
+
           return {
             id: user.id,
             email: user.email,
@@ -51,21 +83,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: user.rol,
             galponId: user.galponId,
           }
-        }
-
-        if (password !== APP_PASSWORD) return null
-
-        const user = await prisma.usuario.findUnique({
-          where: { email },
-        })
-        if (!user || !user.activo) return null
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.nombre,
-          role: user.rol,
-          galponId: user.galponId,
+        } catch (err) {
+          console.error("[AUTH] authorize error:", err)
+          return null
         }
       },
     }),
