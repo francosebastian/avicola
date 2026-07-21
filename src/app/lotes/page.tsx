@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,7 +21,7 @@ export default function LotesPage() {
           <h1 className="text-2xl font-bold">Gestión de Lotes</h1>
           <p className="text-muted-foreground text-sm">Ciclo de vida completo: recepción → cría → recría → postura → descarte</p>
         </div>
-        <Button>+ Nuevo Lote</Button>
+        <Link href="/lotes/nuevo"><Button>+ Nuevo Lote</Button></Link>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -54,7 +55,7 @@ export default function LotesPage() {
                   <td className="p-3">{l.aves.toLocaleString()}</td>
                   <td className="p-3">{l.postura > 0 ? `${l.postura}%` : "—"}</td>
                   <td className="p-3"><Badge variant={l.estado === "postura" ? "default" : "secondary"}>{l.estado}</Badge></td>
-                  <td className="p-3"><Button variant="ghost" size="sm">Ver</Button></td>
+                  <td className="p-3"><Link href={`/lotes/${l.codigo}`}><Button variant="ghost" size="sm">Ver</Button></Link></td>
                 </tr>
               ))}
             </tbody>
