@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth"
+import { getToken } from "next-auth/jwt"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
 const publicRoutes = ["/login", "/api/auth"]
 
@@ -17,20 +18,22 @@ const rolRoutes: Record<string, string[]> = {
   bodeguero: ["/packing", "/despacho", "/inventario", "/fabrica-alimento"],
 }
 
-export default auth((req) => {
+export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
-  const session = req.auth
 
   const isPublic = publicRoutes.some((r) => path.startsWith(r))
   if (isPublic) return NextResponse.next()
 
-  if (!session?.user) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+
+  if (!token) {
     const loginUrl = new URL("/login", req.url)
     loginUrl.searchParams.set("callbackUrl", path)
     return NextResponse.redirect(loginUrl)
   }
 
-  const allowed = rolRoutes[(session.user as any).rol as string]
+  const rol = token.rol as string
+  const allowed = rolRoutes[rol]
   if (!allowed) {
     return NextResponse.redirect(new URL("/login", req.url))
   }
@@ -41,7 +44,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|logo.png).*)"],

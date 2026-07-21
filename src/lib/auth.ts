@@ -21,6 +21,7 @@ declare module "next-auth" {
 const APP_PASSWORD = process.env.APP_PASSWORD || "avicola2026"
 
 export const config = {
+  secret: process.env.AUTH_SECRET,
   pages: {
     signIn: "/login",
   },
