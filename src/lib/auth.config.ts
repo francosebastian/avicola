@@ -56,24 +56,39 @@ const config: NextAuthConfig = {
       const isLoggedIn = !!auth?.user
       const path = nextUrl.pathname
 
+      console.log("[AUTH] authorized called", { path, isLoggedIn, user: auth?.user })
+
       const publicRoutes = ["/login", "/api/auth"]
       const isPublic = publicRoutes.some((r) => path.startsWith(r))
-      if (isPublic) return true
+      if (isPublic) {
+        console.log("[AUTH] public route, allowing")
+        return true
+      }
 
       if (!isLoggedIn) {
+        console.log("[AUTH] not logged in, redirecting to /login")
         const loginUrl = new URL("/login", nextUrl.origin)
         loginUrl.searchParams.set("callbackUrl", path)
         return Response.redirect(loginUrl)
       }
 
       const role = (auth?.user as any)?.role as string | undefined
+      console.log("[AUTH] logged in as", { role, email: (auth?.user as any)?.email })
 
-      if (role === "admin") return true
+      if (role === "admin") {
+        console.log("[AUTH] admin access granted")
+        return true
+      }
 
       const allowed = rolRoutes[role ?? ""]
-      if (!allowed) return false
+      if (!allowed) {
+        console.log("[AUTH] role not found, denying")
+        return false
+      }
 
-      return allowed.some((prefix) => path === prefix || path.startsWith(prefix + "/"))
+      const canAccess = allowed.some((prefix) => path === prefix || path.startsWith(prefix + "/"))
+      console.log("[AUTH] access check", { role, path, canAccess })
+      return canAccess
     },
   },
 }
