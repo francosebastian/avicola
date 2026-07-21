@@ -1,11 +1,29 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import authConfig from "@/lib/auth.config"
+
+declare module "next-auth" {
+  interface User {
+    role?: string
+    galponId?: string | null
+  }
+  interface Session {
+    user: {
+      id: string
+      role?: string
+      name?: string | null
+      email?: string | null
+    }
+  }
+}
 
 const APP_PASSWORD = process.env.APP_PASSWORD || "avicola2026"
 
-const fullConfig = {
-  ...authConfig,
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET,
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
   providers: [
     Credentials({
       credentials: {
@@ -15,7 +33,6 @@ const fullConfig = {
       },
       async authorize(credentials) {
         const { prisma } = await import("@/lib/prisma")
-
         const email = credentials?.email as string | undefined
         const password = credentials?.password as string | undefined
         const pin = credentials?.pin as string | undefined
@@ -53,6 +70,21 @@ const fullConfig = {
       },
     }),
   ],
-}
-
-export const { handlers, auth, signIn, signOut } = NextAuth(fullConfig)
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role ?? "admin"
+        token.galponId = user.galponId ?? undefined
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+      }
+      return session
+    },
+  },
+})
