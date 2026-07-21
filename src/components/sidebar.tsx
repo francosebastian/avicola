@@ -30,9 +30,12 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 bg-sidebar text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0 z-30">
-      <div className="p-4 border-b border-sidebar-muted">
-        <h1 className="text-lg font-bold">🐔 Avícola</h1>
-        <p className="text-xs text-sidebar-foreground/60 mt-1">Sistema de Gestión Avícola</p>
+      <div className="p-4 border-b border-sidebar-muted flex items-center gap-3">
+        <img src="/logo.png" alt="Logo Avícola" className="h-10 w-auto" />
+        <div>
+          <h1 className="text-base font-bold leading-tight">Avícola</h1>
+          <p className="text-xs text-sidebar-foreground/60">Sistema de Gestión</p>
+        </div>
       </div>
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
         {navItems.map((item) => (
