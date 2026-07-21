@@ -6,9 +6,8 @@ import { usePathname } from "next/navigation"
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isLogin = pathname === "/login"
 
-  if (isLogin) {
+  if (pathname === "/login") {
     return <>{children}</>
   }
 

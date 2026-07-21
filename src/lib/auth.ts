@@ -1,27 +1,11 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-
-declare module "next-auth" {
-  interface User {
-    role?: string
-    galponId?: string | null
-  }
-  interface Session {
-    user: {
-      id: string
-      role?: string
-      name?: string | null
-      email?: string | null
-    }
-  }
-}
-
-
+import authConfig from "@/lib/auth.config"
 
 const APP_PASSWORD = process.env.APP_PASSWORD || "avicola2026"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  secret: process.env.AUTH_SECRET,
+const fullConfig = {
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -69,25 +53,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.role = user.role ?? "admin"
-        token.galponId = user.galponId ?? undefined
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
-      }
-      return session
-    },
-  },
-})
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth(fullConfig)
