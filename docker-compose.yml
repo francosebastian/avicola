@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: avicola-db
+    environment:
+      POSTGRES_USER: avicola
+      POSTGRES_PASSWORD: avicola_dev
+      POSTGRES_DB: avicola_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U avicola -d avicola_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    container_name: avicola-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: avicola-app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://avicola:avicola_dev@postgres:5432/avicola_db?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

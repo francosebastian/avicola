@@ -14,7 +14,7 @@
 | Estilos | Tailwind CSS + shadcn/ui |
 | Gráficos | Recharts + D3.js (visualizaciones complejas) |
 | Backend | Next.js API Routes + Server Actions |
-| Base de Datos | Neon (PostgreSQL serverless) + Drizzle ORM |
+| Base de Datos | Neon (PostgreSQL serverless) + Prisma ORM |
 | Autenticación | NextAuth.js v5 (Auth.js) |
 | Almacenamiento | Vercel Blob Storage (evidencia fotográfica) |
 | Tiempo Real | WebSockets (Socket.io o Server-Sent Events) |

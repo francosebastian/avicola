@@ -1,0 +1,729 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Configuración ───
+
+model Usuario {
+  id           String    @id @default(uuid()) @map("id")
+  email        String    @unique @map("email")
+  nombre       String    @map("nombre")
+  rol          String    @default("galponero") @map("rol") // admin, supervisor, galponero, veterinario, bodeguero
+  pin          String?   @map("pin")
+  activo       Boolean   @default(true) @map("activo")
+  ultimoAcceso DateTime? @map("ultimo_acceso") @db.Timestamptz()
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  galponId String? @map("galpon_id")
+
+  @@map("usuarios")
+}
+
+model Galpon {
+  id              String  @id @default(uuid()) @map("id")
+  nombre          String  @map("nombre")
+  tipo            String  @default("jaula") @map("tipo") // jaula, piso, pastoreo
+  capacidadMaxima Int?    @map("capacidad_maxima")
+  activo          Boolean @default(true) @map("activo")
+
+  secciones             Seccion[]
+  equipos               Equipo[]
+  checklistBioseguridad ChecklistBioseguridad[]
+
+  @@map("galpones")
+}
+
+model Seccion {
+  id              String  @id @default(uuid()) @map("id")
+  galponId        String  @map("galpon_id")
+  galpon          Galpon  @relation(fields: [galponId], references: [id])
+  nombre          String  @map("nombre")
+  codigo          String? @map("codigo")
+  capacidadMaxima Int?    @map("capacidad_maxima")
+  activo          Boolean @default(true) @map("activo")
+
+  lotes                Lote[]
+  registroDiario       RegistroDiario[]
+  consumoAgua          ConsumoAgua[]
+  registrosAmbientales RegistroAmbiental[]
+  registroIluminacion  RegistroIluminacionDiario[]
+  registroPacking      RegistroPacking[]
+
+  @@unique([galponId, nombre])
+  @@map("secciones")
+}
+
+// ─── Lotes ───
+
+model Lote {
+  id                   String    @id @default(uuid()) @map("id")
+  codigoLote           String    @unique @map("codigo_lote")
+  seccionId            String    @map("seccion_id")
+  seccion              Seccion   @relation(fields: [seccionId], references: [id])
+  lineaGenetica        String    @map("linea_genetica")
+  proveedorPollita     String?   @map("proveedor_pollita")
+  cantidadInicial      Int       @map("cantidad_inicial")
+  fechaRecepcion       DateTime  @map("fecha_recepcion") @db.Date
+  fechaNacimiento      DateTime? @map("fecha_nacimiento") @db.Date
+  pesoInicialPromedio  Decimal?  @map("peso_inicial_promedio") @db.Decimal(5, 2)
+  costoPollitaUnitario Decimal?  @map("costo_pollita_unitario") @db.Decimal(10, 2)
+  estado               String    @default("activo") @map("estado") // cria, recria, postura, descarte, cerrado
+  fechaCierre          DateTime? @map("fecha_cierre") @db.Date
+  motivoCierre         String?   @map("motivo_cierre")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  eventosLote           EventoLote[]
+  registroDiario        RegistroDiario[]
+  muestreoPeso          MuestreoPeso[]
+  consumoAgua           ConsumoAgua[]
+  programaIluminacion   ProgramaIluminacion[]
+  registroIluminacion   RegistroIluminacionDiario[]
+  registrosAmbientales  RegistroAmbiental[]
+  consumoAlimentoDiario ConsumoAlimentoDiario[]
+  registroVacunacion    RegistroVacunacion[]
+  registroTratamiento   RegistroTratamiento[]
+  necropsias            Necropsia[]
+  controlCalidadHuevo   ControlCalidadHuevo[]
+  trazabilidad          Trazabilidad[]
+  inventarioHuevo       InventarioHuevo[]
+  registroPacking       RegistroPacking[]
+  costosLote            CostoLote[]
+  resumenLote           ResumenLote?
+  presupuestos          Presupuesto[]
+  residuos              Residuo[]
+
+  @@map("lotes")
+}
+
+model EventoLote {
+  id          String   @id @default(uuid()) @map("id")
+  loteId      String   @map("lote_id")
+  lote        Lote     @relation(fields: [loteId], references: [id])
+  tipoEvento  String   @map("tipo_evento")
+  fecha       DateTime @db.Date
+  descripcion String?
+  fotoUrl     String?  @map("foto_url")
+  createdBy   String?  @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("eventos_lote")
+}
+
+// ─── Producción ───
+
+model RegistroDiario {
+  id                 String   @id @default(uuid()) @map("id")
+  loteId             String   @map("lote_id")
+  lote               Lote     @relation(fields: [loteId], references: [id])
+  seccionId          String   @map("seccion_id")
+  seccion            Seccion  @relation(fields: [seccionId], references: [id])
+  fecha              DateTime @db.Date
+  avesVivas          Int?     @map("aves_vivas")
+  bajasDia           Int?     @map("bajas_dia")
+  huevosProducidos   Int?     @map("huevos_producidos")
+  huevosJumbo        Int?     @default(0) @map("huevos_jumbo")
+  huevosSuper        Int?     @default(0) @map("huevos_super")
+  huevosExtra        Int?     @default(0) @map("huevos_extra")
+  huevosPrimera      Int?     @default(0) @map("huevos_primera")
+  huevosSegunda      Int?     @default(0) @map("huevos_segunda")
+  huevosTercera      Int?     @default(0) @map("huevos_tercera")
+  huevosSubproducto  Int?     @default(0) @map("huevos_subproducto")
+  consumoAlimentoKg  Decimal? @map("consumo_alimento_kg") @db.Decimal(10, 2)
+  consumoAguaLitros  Decimal? @map("consumo_agua_litros") @db.Decimal(10, 2)
+  lecturaMedidorAgua Decimal? @map("lectura_medidor_agua") @db.Decimal(10, 2)
+  temperaturaMin     Decimal? @map("temperatura_min") @db.Decimal(4, 1)
+  temperaturaMax     Decimal? @map("temperatura_max") @db.Decimal(4, 1)
+  observaciones      String?  @db.Text
+  fotoRegistro       String?  @map("foto_registro")
+  registradoPor      String?  @map("registrado_por")
+  sincronizado       Boolean  @default(true) @map("sincronizado")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@unique([seccionId, fecha])
+  @@map("registro_diario")
+}
+
+model MuestreoPeso {
+  id                    String   @id @default(uuid()) @map("id")
+  loteId                String   @map("lote_id")
+  lote                  Lote     @relation(fields: [loteId], references: [id])
+  fecha                 DateTime @db.Date
+  avesMuestreadas       Int      @map("aves_muestreadas")
+  pesoPromedioGramos    Decimal  @map("peso_promedio_gramos") @db.Decimal(6, 2)
+  uniformidadPorcentaje Decimal? @map("uniformidad_porcentaje") @db.Decimal(5, 2)
+  cv                    Decimal? @map("cv") @db.Decimal(5, 2)
+  pesoMin               Decimal? @map("peso_min") @db.Decimal(6, 2)
+  pesoMax               Decimal? @map("peso_max") @db.Decimal(6, 2)
+  observaciones         String?  @db.Text
+
+  @@map("muestreo_peso")
+}
+
+// ─── Agua ───
+
+model ConsumoAgua {
+  id               String   @id @default(uuid()) @map("id")
+  loteId           String   @map("lote_id")
+  lote             Lote     @relation(fields: [loteId], references: [id])
+  seccionId        String?  @map("seccion_id")
+  seccion          Seccion? @relation(fields: [seccionId], references: [id])
+  fecha            DateTime @db.Date
+  lecturaMedidor   Decimal? @map("lectura_medidor") @db.Decimal(10, 2)
+  litrosConsumidos Decimal? @map("litros_consumidos") @db.Decimal(10, 2)
+  avesPeriodo      Int?     @map("aves_periodo")
+  observaciones    String?  @db.Text
+
+  @@unique([loteId, fecha])
+  @@map("consumo_agua")
+}
+
+// ─── Iluminación ───
+
+model ProgramaIluminacion {
+  id            String  @id @default(uuid()) @map("id")
+  loteId        String  @map("lote_id")
+  lote          Lote    @relation(fields: [loteId], references: [id])
+  semanaVida    Int     @map("semana_vida")
+  horasLuz      Decimal @map("horas_luz") @db.Decimal(4, 2)
+  intensidadLux Int?    @map("intensidad_lux")
+  horaEncendido String? @map("hora_encendido") // TIME as string
+  horaApagado   String? @map("hora_apagado")
+  tipoPeriodo   String  @default("postura") @map("tipo_periodo")
+
+  @@unique([loteId, semanaVida])
+  @@map("programa_iluminacion")
+}
+
+model RegistroIluminacionDiario {
+  id                String   @id @default(uuid()) @map("id")
+  loteId            String   @map("lote_id")
+  lote              Lote     @relation(fields: [loteId], references: [id])
+  seccionId         String?  @map("seccion_id")
+  seccion           Seccion? @relation(fields: [seccionId], references: [id])
+  fecha             DateTime @db.Date
+  horasLuzReales    Decimal? @map("horas_luz_reales") @db.Decimal(4, 2)
+  horaEncendidoReal String?  @map("hora_encendido_real")
+  horaApagadoReal   String?  @map("hora_apagado_real")
+  intensidadLux     Int?     @map("intensidad_lux")
+  observaciones     String?  @db.Text
+
+  @@unique([loteId, fecha])
+  @@map("registro_iluminacion_diario")
+}
+
+// ─── Ambiental ───
+
+model RegistroAmbiental {
+  id              String   @id @default(uuid()) @map("id")
+  loteId          String   @map("lote_id")
+  lote            Lote     @relation(fields: [loteId], references: [id])
+  seccionId       String   @map("seccion_id")
+  seccion         Seccion  @relation(fields: [seccionId], references: [id])
+  fechaHora       DateTime @map("fecha_hora") @db.Timestamptz()
+  temperatura     Decimal? @db.Decimal(4, 1)
+  humedad         Decimal? @db.Decimal(4, 1)
+  amoniacoPpm     Decimal? @map("amoniaco_ppm") @db.Decimal(5, 1)
+  co2Ppm          Decimal? @map("co2_ppm") @db.Decimal(6, 1)
+  velocidadAireMs Decimal? @map("velocidad_aire_ms") @db.Decimal(4, 2)
+  fuente          String   @default("manual") @map("fuente")
+
+  @@unique([seccionId, fechaHora])
+  @@map("registros_ambientales")
+}
+
+// ─── Alimentación ───
+
+model FormulaAlimento {
+  id                   String   @id @default(uuid()) @map("id")
+  nombre               String   @map("nombre")
+  tipoAlimento         String   @map("tipo_alimento")
+  ingredientes         Json     @map("ingredientes") // [{"ingrediente":"maiz","porcentaje":62.5}]
+  costoKgEstimado      Decimal? @map("costo_kg_estimado") @db.Decimal(8, 4)
+  proteinaBruta        Decimal? @map("proteina_bruta") @db.Decimal(5, 2)
+  energiaMetabolizable Decimal? @map("energia_metabolizable") @db.Decimal(6, 2)
+  activo               Boolean  @default(true) @map("activo")
+
+  consumoDiario       ConsumoAlimentoDiario[]
+  fabricacionAlimento FabricacionAlimento[]
+
+  @@map("formulas_alimento")
+}
+
+model ConsumoAlimentoDiario {
+  id                     String           @id @default(uuid()) @map("id")
+  loteId                 String           @map("lote_id")
+  lote                   Lote             @relation(fields: [loteId], references: [id])
+  fecha                  DateTime         @db.Date
+  tipoAlimento           String           @map("tipo_alimento")
+  cantidadKg             Decimal          @map("cantidad_kg") @db.Decimal(10, 2)
+  formulaId              String?          @map("formula_id")
+  formula                FormulaAlimento? @relation(fields: [formulaId], references: [id])
+  inventarioMovimientoId String?          @map("inventario_movimiento_id")
+
+  @@unique([loteId, fecha, tipoAlimento])
+  @@map("consumo_alimento_diario")
+}
+
+model RecepcionInsumo {
+  id           String   @id @default(uuid()) @map("id")
+  fechaLlegada DateTime @map("fecha_llegada") @db.Date
+  proveedor    String   @map("proveedor")
+  vehiculo     String?  @map("vehiculo")
+  patente      String?  @map("patente")
+  tipoInsumo   String   @map("tipo_insumo") // maiz, soya, conchuela, vitaminas, harinilla, calcio, minerales
+  cantidadKg   Decimal  @map("cantidad_kg") @db.Decimal(12, 2)
+  numeroLote   String   @map("numero_lote")
+  numeroGuia   String   @map("numero_guia")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("recepcion_insumos")
+}
+
+model StockInsumo {
+  id            String   @id @default(uuid()) @map("id")
+  tipoInsumo    String   @unique @map("tipo_insumo")
+  stockActualKg Decimal  @default(0) @map("stock_actual_kg") @db.Decimal(12, 2)
+  stockMinimoKg Decimal  @default(0) @map("stock_minimo_kg") @db.Decimal(12, 2)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("stock_insumos")
+}
+
+model FabricacionAlimento {
+  id                  String          @id @default(uuid()) @map("id")
+  fecha               DateTime        @db.Date
+  formulaId           String          @map("formula_id")
+  formula             FormulaAlimento @relation(fields: [formulaId], references: [id])
+  cantidadProducidaKg Decimal         @map("cantidad_producida_kg") @db.Decimal(12, 2)
+  destinoGalponId     String?         @map("destino_galpon_id")
+  destinoSeccionId    String?         @map("destino_seccion_id")
+  loteFabricacion     String          @map("lote_fabricacion")
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+
+  detalle DetalleFabricacion[]
+
+  @@map("fabricacion_alimento")
+}
+
+model DetalleFabricacion {
+  id                  String              @id @default(uuid()) @map("id")
+  fabricacionId       String              @map("fabricacion_id")
+  fabricacion         FabricacionAlimento @relation(fields: [fabricacionId], references: [id])
+  tipoInsumo          String              @map("tipo_insumo")
+  cantidadRequeridaKg Decimal             @map("cantidad_requerida_kg") @db.Decimal(12, 2)
+
+  @@map("detalle_fabricacion")
+}
+
+// ─── Sanidad ───
+
+model RegistroVacunacion {
+  id              String   @id @default(uuid()) @map("id")
+  loteId          String   @map("lote_id")
+  lote            Lote     @relation(fields: [loteId], references: [id])
+  tipoVacuna      String   @map("tipo_vacuna")
+  fechaAplicacion DateTime @map("fecha_aplicacion") @db.Date
+  viaAplicacion   String   @map("via_aplicacion") // ocular, im, sc, agua_bebida, subcutanea
+  dosisMl         Decimal? @map("dosis_ml") @db.Decimal(6, 2)
+  loteVacuna      String?  @map("lote_vacuna")
+  proveedorVacuna String?  @map("proveedor_vacuna")
+  aplicadoPor     String?  @map("aplicado_por")
+  observaciones   String?  @db.Text
+
+  @@map("registro_vacunacion")
+}
+
+model RegistroTratamiento {
+  id                 String    @id @default(uuid()) @map("id")
+  loteId             String    @map("lote_id")
+  lote               Lote      @relation(fields: [loteId], references: [id])
+  medicamento        String    @map("medicamento")
+  principioActivo    String?   @map("principio_activo")
+  dosis              Decimal?  @db.Decimal(10, 2)
+  viaAplicacion      String?   @map("via_aplicacion")
+  fechaInicio        DateTime  @map("fecha_inicio") @db.Date
+  fechaFin           DateTime? @map("fecha_fin") @db.Date
+  periodoRetiroHoras Int?      @map("periodo_retiro_horas")
+  motivo             String?   @db.Text
+  responsable        String?   @map("responsable")
+  ventaBloqueada     Boolean   @default(false) @map("venta_bloqueada")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("registro_tratamientos")
+}
+
+model Necropsia {
+  id                     String   @id @default(uuid()) @map("id")
+  loteId                 String   @map("lote_id")
+  lote                   Lote     @relation(fields: [loteId], references: [id])
+  fecha                  DateTime @db.Date
+  avesExaminadas         Int      @default(1) @map("aves_examinadas")
+  hallazgosMacroscopicos String?  @map("hallazgos_macroscopicos") @db.Text
+  hallazgosOrganos       Json?    @map("hallazgos_organos")
+  fotos                  String[] @map("fotos")
+  diagnosticoPresuntivo  String?  @map("diagnostico_presuntivo")
+  diagnosticoConfirmado  String?  @map("diagnostico_confirmado")
+  laboratorio            String?  @map("laboratorio")
+  realizadaPor           String?  @map("realizada_por")
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("necropsias")
+}
+
+model RegistroVisita {
+  id                        String    @id @default(uuid()) @map("id")
+  visitanteNombre           String    @map("visitante_nombre")
+  visitanteEmpresa          String?   @map("visitante_empresa")
+  visitanteRut              String?   @map("visitante_rut")
+  fechaVisita               DateTime  @default(now()) @map("fecha_visita") @db.Timestamptz()
+  ultimaVisitaOtraGranja    DateTime? @map("ultima_visita_otra_granja") @db.Date
+  periodoCuarentenaCumplido Boolean   @default(false) @map("periodo_cuarentena_cumplido")
+  vehiculoPlaca             String?   @map("vehiculo_placa")
+  vehiculoDesinfectado      Boolean   @default(false) @map("vehiculo_desinfectado")
+  firmaDigital              String?   @map("firma_digital")
+  autorizadoPor             String?   @map("autorizado_por")
+  observaciones             String?   @db.Text
+
+  @@map("registro_visitas")
+}
+
+model ChecklistBioseguridad {
+  id                      String   @id @default(uuid()) @map("id")
+  galponId                String   @map("galpon_id")
+  galpon                  Galpon   @relation(fields: [galponId], references: [id])
+  fecha                   DateTime @db.Date
+  loteId                  String?  @map("lote_id")
+  pediluviosActivos       Boolean? @map("pediluvios_activos")
+  cortinasBuenEstado      Boolean? @map("cortinas_buen_estado")
+  mallasAvesSilvestres    Boolean? @map("mallas_aves_silvestres")
+  ausenciaRoedores        Boolean? @map("ausencia_roedores")
+  ausenciaMoscasExcesivas Boolean? @map("ausencia_moscas_excesivas")
+  rodaluvioFuncional      Boolean? @map("rodaluvio_funcional")
+  cercoPerimetralIntacto  Boolean? @map("cerco_perimetral_intacto")
+  observaciones           String?  @db.Text
+  registradoPor           String?  @map("registrado_por")
+
+  @@unique([galponId, fecha])
+  @@map("checklist_bioseguridad")
+}
+
+// ─── Calidad de Huevo ───
+
+model ControlCalidadHuevo {
+  id                    String   @id @default(uuid()) @map("id")
+  loteId                String   @map("lote_id")
+  lote                  Lote     @relation(fields: [loteId], references: [id])
+  fecha                 DateTime @db.Date
+  muestraId             Int?     @map("muestra_id")
+  pesoPromedioGramos    Decimal? @map("peso_promedio_gramos") @db.Decimal(5, 2)
+  unidadHaugh           Decimal? @map("unidad_haugh") @db.Decimal(5, 1)
+  colorYema             Int?     @map("color_yema")
+  resistenciaCascaraKgf Decimal? @map("resistencia_cascara_kgf") @db.Decimal(4, 2)
+  phClara               Decimal? @map("ph_clara") @db.Decimal(4, 2)
+  phYema                Decimal? @map("ph_yema") @db.Decimal(4, 2)
+  camaraAireMm          Decimal? @map("camara_aire_mm") @db.Decimal(4, 2)
+  observaciones         String?  @db.Text
+  registradoPor         String?  @map("registrado_por")
+
+  @@map("control_calidad_huevo")
+}
+
+model Trazabilidad {
+  id                   String    @id @default(uuid()) @map("id")
+  codigoEnvase         String    @unique @map("codigo_envase")
+  loteId               String    @map("lote_id")
+  lote                 Lote      @relation(fields: [loteId], references: [id])
+  seccionId            String?   @map("seccion_id")
+  galponId             String?   @map("galpon_id")
+  fechaPostura         DateTime  @map("fecha_postura") @db.Date
+  clasificacion        String    @map("clasificacion")
+  fechaDespacho        DateTime? @map("fecha_despacho") @db.Date
+  certificadoSanitario String?   @map("certificado_sanitario") @db.Text
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("trazabilidad")
+}
+
+// ─── Packing ───
+
+model FormatoCaja {
+  id              String  @id @default(uuid()) @map("id")
+  categoria       String  @unique @map("categoria")
+  unidadesPorCaja Int     @default(180) @map("unidades_por_caja")
+  activo          Boolean @default(true) @map("activo")
+
+  @@map("formato_cajas")
+}
+
+model InventarioPacking {
+  id               String   @id @default(uuid()) @map("id")
+  categoria        String   @unique @map("categoria")
+  stockCajas       Int      @default(0) @map("stock_cajas")
+  stockUnidades    Int      @default(0) @map("stock_unidades")
+  stockMinimoCajas Int      @default(0) @map("stock_minimo_cajas")
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("inventario_packing")
+}
+
+model RegistroPacking {
+  id             String   @id @default(uuid()) @map("id")
+  fecha          DateTime @db.Date
+  loteId         String   @map("lote_id")
+  lote           Lote     @relation(fields: [loteId], references: [id])
+  seccionId      String   @map("seccion_id")
+  seccion        Seccion  @relation(fields: [seccionId], references: [id])
+  huevosSucio    Int      @default(0) @map("huevos_sucio")
+  huevosRoto     Int      @default(0) @map("huevos_roto")
+  huevosDescarte Int      @default(0) @map("huevos_descarte")
+  cajasJumbo     Int      @default(0) @map("cajas_jumbo")
+  cajasSuper     Int      @default(0) @map("cajas_super")
+  cajasExtra     Int      @default(0) @map("cajas_extra")
+  cajasPrimera   Int      @default(0) @map("cajas_primera")
+  cajasSegunda   Int      @default(0) @map("cajas_segunda")
+  cajasTercera   Int      @default(0) @map("cajas_tercera")
+  registradoPor  String?  @map("registrado_por")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@unique([loteId, seccionId, fecha])
+  @@map("registro_packing")
+}
+
+// ─── Despacho ───
+
+model Despacho {
+  id              String   @id @default(uuid()) @map("id")
+  fecha           DateTime @db.Date
+  horaSalida      DateTime @default(now()) @map("hora_salida") @db.Timestamptz()
+  chofer          String   @map("chofer")
+  destino         String   @map("destino") @db.Text
+  vehiculoPatente String?  @map("vehiculo_patente")
+  numeroGuia      String?  @map("numero_guia")
+  observaciones   String?  @db.Text
+  registradoPor   String?  @map("registrado_por")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  detalle DetalleDespacho[]
+
+  @@map("despachos")
+}
+
+model DetalleDespacho {
+  id               String   @id @default(uuid()) @map("id")
+  despachoId       String   @map("despacho_id")
+  despacho         Despacho @relation(fields: [despachoId], references: [id])
+  categoria        String   @map("categoria")
+  cantidadCajas    Int      @map("cantidad_cajas")
+  cantidadUnidades Int?     @map("cantidad_unidades")
+
+  @@unique([despachoId, categoria])
+  @@map("detalle_despacho")
+}
+
+// ─── Inventarios ───
+
+model Almacen {
+  id          String  @id @default(uuid()) @map("id")
+  nombre      String  @map("nombre")
+  tipo        String  @map("tipo") // alimento, insumos, huevos, empaques, general
+  ubicacion   String? @db.Text
+  responsable String? @map("responsable")
+  activo      Boolean @default(true) @map("activo")
+
+  productos InventarioProducto[]
+
+  @@map("almacenes")
+}
+
+model InventarioProducto {
+  id                    String   @id @default(uuid()) @map("id")
+  almacenId             String   @map("almacen_id")
+  almacen               Almacen  @relation(fields: [almacenId], references: [id])
+  nombre                String   @map("nombre")
+  sku                   String?  @unique @map("sku")
+  categoria             String?  @map("categoria")
+  unidadMedida          String   @map("unidad_medida")
+  stockActual           Decimal  @default(0) @map("stock_actual") @db.Decimal(12, 2)
+  stockMinimo           Decimal  @default(0) @map("stock_minimo") @db.Decimal(12, 2)
+  costoPromedioUnitario Decimal? @map("costo_promedio_unitario") @db.Decimal(12, 4)
+  activo                Boolean  @default(true) @map("activo")
+
+  movimientos MovimientoInventario[]
+
+  @@map("inventario_productos")
+}
+
+model MovimientoInventario {
+  id             String             @id @default(uuid()) @map("id")
+  productoId     String             @map("producto_id")
+  producto       InventarioProducto @relation(fields: [productoId], references: [id])
+  tipoMovimiento String             @map("tipo_movimiento") // entrada, salida, transferencia, ajuste
+  cantidad       Decimal            @db.Decimal(12, 2)
+  saldoAnterior  Decimal?           @map("saldo_anterior") @db.Decimal(12, 2)
+  saldoNuevo     Decimal?           @map("saldo_nuevo") @db.Decimal(12, 2)
+  referenciaTipo String?            @map("referencia_tipo")
+  referenciaId   String?            @map("referencia_id")
+  costoUnitario  Decimal?           @map("costo_unitario") @db.Decimal(12, 4)
+  loteProveedor  String?            @map("lote_proveedor")
+  observaciones  String?            @db.Text
+  createdBy      String?            @map("created_by")
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("movimientos_inventario")
+}
+
+model InventarioHuevo {
+  id                 String    @id @default(uuid()) @map("id")
+  almacenId          String    @map("almacen_id")
+  loteId             String    @map("lote_id")
+  lote               Lote      @relation(fields: [loteId], references: [id])
+  clasificacion      String    @map("clasificacion")
+  cantidadDocenas    Int       @map("cantidad_docenas")
+  fechaProduccion    DateTime  @map("fecha_produccion") @db.Date
+  fechaVencimiento   DateTime? @map("fecha_vencimiento") @db.Date
+  stockActualDocenas Int       @map("stock_actual_docenas")
+  ubicacion          String?   @map("ubicacion")
+
+  @@map("inventario_huevos")
+}
+
+// ─── Mantenimiento ───
+
+model Equipo {
+  id                       String    @id @default(uuid()) @map("id")
+  galponId                 String?   @map("galpon_id")
+  galpon                   Galpon?   @relation(fields: [galponId], references: [id])
+  nombre                   String    @map("nombre")
+  tipo                     String    @map("tipo")
+  marca                    String?   @map("marca")
+  modelo                   String?   @map("modelo")
+  numeroSerie              String?   @map("numero_serie")
+  fechaInstalacion         DateTime? @map("fecha_instalacion") @db.Date
+  frecuenciaMantencionDias Int?      @map("frecuencia_mantencion_dias")
+  proximaMantencion        DateTime? @map("proxima_mantencion") @db.Date
+  activo                   Boolean   @default(true) @map("activo")
+  observaciones            String?   @db.Text
+
+  mantenimientos Mantenimiento[]
+
+  @@map("equipos")
+}
+
+model Mantenimiento {
+  id                   String    @id @default(uuid()) @map("id")
+  equipoId             String    @map("equipo_id")
+  equipo               Equipo    @relation(fields: [equipoId], references: [id])
+  tipo                 String    @map("tipo") // preventivo, correctivo
+  fecha                DateTime  @db.Date
+  descripcion          String    @db.Text
+  repuestosUtilizados  String?   @map("repuestos_utilizados") @db.Text
+  costo                Decimal?  @db.Decimal(10, 2)
+  duracionHoras        Decimal?  @map("duracion_horas") @db.Decimal(4, 1)
+  responsable          String?   @map("responsable")
+  proximaFechaSugerida DateTime? @map("proxima_fecha_sugerida") @db.Date
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("mantenimiento")
+}
+
+// ─── Finanzas ───
+
+model CostoLote {
+  id          String   @id @default(uuid()) @map("id")
+  loteId      String   @map("lote_id")
+  lote        Lote     @relation(fields: [loteId], references: [id])
+  tipoCosto   String   @map("tipo_costo")
+  monto       Decimal  @db.Decimal(12, 2)
+  fecha       DateTime @db.Date
+  categoria   String?  @map("categoria") // fijo, variable
+  descripcion String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("costos_lote")
+}
+
+model ResumenLote {
+  id                    String   @id @default(uuid()) @map("id")
+  loteId                String   @unique @map("lote_id")
+  lote                  Lote     @relation(fields: [loteId], references: [id])
+  costoTotalAlimento    Decimal? @map("costo_total_alimento") @db.Decimal(12, 2)
+  costoTotalPollitas    Decimal? @map("costo_total_pollitas") @db.Decimal(12, 2)
+  costoTotalOperativo   Decimal? @map("costo_total_operativo") @db.Decimal(12, 2)
+  ingresoTotalHuevos    Decimal? @map("ingreso_total_huevos") @db.Decimal(12, 2)
+  ingresoTotalGallinaza Decimal? @map("ingreso_total_gallinaza") @db.Decimal(12, 2)
+  ingresoVentaDescarte  Decimal? @map("ingreso_venta_descarte") @db.Decimal(12, 2)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("resumen_lote")
+}
+
+model Presupuesto {
+  id        String   @id @default(uuid()) @map("id")
+  loteId    String?  @map("lote_id")
+  lote      Lote?    @relation(fields: [loteId], references: [id])
+  galponId  String?  @map("galpon_id")
+  anio      Int      @map("anio")
+  tipo      String?  @map("tipo")
+  partidas  Json     @map("partidas")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("presupuestos")
+}
+
+// ─── Residuos ───
+
+model Residuo {
+  id                String    @id @default(uuid()) @map("id")
+  loteId            String    @map("lote_id")
+  lote              Lote      @relation(fields: [loteId], references: [id])
+  fecha             DateTime  @db.Date
+  horaSalida        DateTime? @map("hora_salida") @db.Timestamptz()
+  tipo              String    @map("tipo") // gallinaza, aves_muertas, subproducto_huevo, otros
+  cantidad          Decimal   @db.Decimal(10, 2)
+  unidad            String    @map("unidad") // kg, m3, unidades, docenas
+  metodoDisposicion String?   @map("metodo_disposicion")
+  transportista     String?   @map("transportista")
+  patenteVehiculo   String?   @map("patente_vehiculo")
+  destinoDetalle    String?   @map("destino_detalle") @db.Text
+  ingreso           Decimal   @default(0) @db.Decimal(10, 2)
+  costoDisposicion  Decimal   @default(0) @map("costo_disposicion") @db.Decimal(10, 2)
+  observaciones     String?   @db.Text
+
+  @@map("residuos")
+}
+
+// ─── Configuración ───
+
+model CurvaEstandar {
+  id                    String   @id @default(uuid()) @map("id")
+  lineaGenetica         String   @map("linea_genetica")
+  semanaVida            Int      @map("semana_vida")
+  posturaEsperada       Decimal? @map("postura_esperada") @db.Decimal(5, 2)
+  mortalidadEsperada    Decimal? @map("mortalidad_esperada") @db.Decimal(5, 2)
+  consumoEsperadoGramos Decimal? @map("consumo_esperado_gramos") @db.Decimal(6, 2)
+  pesoHuevoEsperado     Decimal? @map("peso_huevo_esperado") @db.Decimal(5, 2)
+  pesoCorporalEsperado  Decimal? @map("peso_corporal_esperado") @db.Decimal(6, 2)
+
+  @@unique([lineaGenetica, semanaVida])
+  @@map("curvas_estandar")
+}
+
+model ConfiguracionAlerta {
+  id                String   @id @default(uuid()) @map("id")
+  loteId            String?  @map("lote_id")
+  tipoAlerta        String   @map("tipo_alerta")
+  umbralMin         Decimal? @map("umbral_min") @db.Decimal(10, 2)
+  umbralMax         Decimal? @map("umbral_max") @db.Decimal(10, 2)
+  activa            Boolean  @default(true) @map("activa")
+  canalNotificacion String[] @map("canal_notificacion")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("configuracion_alertas")
+}

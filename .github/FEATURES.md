@@ -558,7 +558,7 @@ Template para nuevas features:
 | Estilos | Tailwind CSS v4 + shadcn/ui |
 | Gráficos | Recharts |
 | Backend | Next.js API Routes + Server Actions |
-| Base de Datos | Neon (PostgreSQL serverless) + Drizzle ORM |
+| Base de Datos | Neon (PostgreSQL serverless) + Prisma ORM |
 | Autenticación | NextAuth.js v5 (Auth.js) |
 | Formularios | react-hook-form + @hookform/resolvers + Zod |
 | PWA | next-pwa |
