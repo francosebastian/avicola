@@ -16,12 +16,7 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    role: string
-    galponId?: string
-  }
-}
+
 
 const APP_PASSWORD = process.env.APP_PASSWORD || "avicola2026"
 
