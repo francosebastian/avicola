@@ -16,6 +16,7 @@ const navItems = [
   { href: "/bioseguridad", label: "Bioseguridad", icon: "🛡️" },
   { href: "/calidad", label: "Calidad de Huevo", icon: "🔬" },
   { href: "/packing", label: "Packing", icon: "📦" },
+  { href: "/despacho", label: "Despachos", icon: "🚚" },
   { href: "/fabrica-alimento", label: "Fábrica Alimento", icon: "🏭" },
   { href: "/inventario", label: "Inventarios", icon: "📊" },
   { href: "/graficos", label: "Gráficos", icon: "📊" },
