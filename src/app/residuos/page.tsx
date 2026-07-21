@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 const gallinazaData = [
-  { fecha: "20 Jul 2026", tipo: "Gallinaza húmeda", cantidad: 0.8, disposicion: "Venta a productor", ingreso: 24.00 },
-  { fecha: "18 Jul 2026", tipo: "Gallinaza seca", cantidad: 1.2, disposicion: "Venta a productor", ingreso: 60.00 },
-  { fecha: "15 Jul 2026", tipo: "Gallinaza húmeda", cantidad: 0.9, disposicion: "Compostaje", ingreso: 0 },
-  { fecha: "13 Jul 2026", tipo: "Gallinaza seca", cantidad: 1.0, disposicion: "Venta a productor", ingreso: 50.00 },
-  { fecha: "10 Jul 2026", tipo: "Gallinaza húmeda", cantidad: 0.7, disposicion: "Compostaje", ingreso: 0 },
-  { fecha: "08 Jul 2026", tipo: "Gallinaza seca", cantidad: 1.1, disposicion: "Venta a productor", ingreso: 55.00 },
-  { fecha: "05 Jul 2026", tipo: "Gallinaza húmeda", cantidad: 0.85, disposicion: "Venta a productor", ingreso: 25.50 },
+  { fecha: "20 Jul 2026", hora: "14:30", tipo: "Gallinaza húmeda", cantidad: 0.8, unidad: "ton", transportista: "Carlos Muñoz", patente: "ABC-123", destino: "Productor Agrícola — Viña del Valle", disposicion: "Venta a productor", ingreso: 24.00 },
+  { fecha: "18 Jul 2026", hora: "10:15", tipo: "Gallinaza seca", cantidad: 1.2, unidad: "ton", transportista: "Transportes El Carmelo", patente: "DEF-456", destino: "Productor de hortalizas — Melipilla", disposicion: "Venta a productor", ingreso: 60.00 },
+  { fecha: "15 Jul 2026", hora: "16:00", tipo: "Gallinaza húmeda", cantidad: 0.9, unidad: "ton", transportista: "—", patente: "—", destino: "Compostaje interno — Sector Norte", disposicion: "Compostaje", ingreso: 0 },
+  { fecha: "13 Jul 2026", hora: "09:45", tipo: "Gallinaza seca", cantidad: 1.0, unidad: "ton", transportista: "Juan Pérez", patente: "GHI-789", destino: "Frutícola Los Andes", disposicion: "Venta a productor", ingreso: 50.00 },
+  { fecha: "10 Jul 2026", hora: "15:30", tipo: "Gallinaza húmeda", cantidad: 0.7, unidad: "ton", transportista: "—", patente: "—", destino: "Compostaje interno — Sector Sur", disposicion: "Compostaje", ingreso: 0 },
+  { fecha: "08 Jul 2026", hora: "11:00", tipo: "Gallinaza seca", cantidad: 1.1, unidad: "ton", transportista: "Transportes El Carmelo", patente: "DEF-456", destino: "Productor de hortalizas — Melipilla", disposicion: "Venta a productor", ingreso: 55.00 },
+  { fecha: "05 Jul 2026", hora: "08:20", tipo: "Gallinaza húmeda", cantidad: 0.85, unidad: "ton", transportista: "Carlos Muñoz", patente: "ABC-123", destino: "Viña del Valle", disposicion: "Venta a productor", ingreso: 25.50 },
 ]
 
 const avesMuertasData = [
@@ -56,16 +56,20 @@ export default function ResiduosPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b text-left text-sm text-muted-foreground">
-                <th className="p-3 font-medium">Fecha</th><th className="p-3 font-medium">Tipo</th><th className="p-3 font-medium">Cantidad (ton)</th><th className="p-3 font-medium">Disposición</th><th className="p-3 font-medium">Ingreso</th>
+                <th className="p-3 font-medium">Fecha</th><th className="p-3 font-medium">Hora</th><th className="p-3 font-medium">Tipo</th><th className="p-3 font-medium">Cantidad</th>
+                <th className="p-3 font-medium">Transportista</th><th className="p-3 font-medium">Patente</th><th className="p-3 font-medium">Destino</th><th className="p-3 font-medium">Ingreso</th>
               </tr>
             </thead>
             <tbody>
               {gallinazaData.map((g, i) => (
                 <tr key={i} className="border-b last:border-0 hover:bg-muted/50">
                   <td className="p-3 text-sm">{g.fecha}</td>
+                  <td className="p-3 text-sm">{g.hora}</td>
                   <td className="p-3"><Badge variant="secondary">{g.tipo}</Badge></td>
-                  <td className="p-3">{g.cantidad} t</td>
-                  <td className="p-3 text-sm">{g.disposicion}</td>
+                  <td className="p-3">{g.cantidad} {g.unidad}</td>
+                  <td className="p-3 text-sm">{g.transportista}</td>
+                  <td className="p-3 font-mono text-xs">{g.patente}</td>
+                  <td className="p-3 text-sm max-w-[200px] truncate" title={g.destino}>{g.destino}</td>
                   <td className="p-3">{g.ingreso > 0 ? `$${g.ingreso.toFixed(2)}` : "—"}</td>
                 </tr>
               ))}
