@@ -1,8 +1,6 @@
 "use client"
 
-import { Suspense } from "react"
-import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,26 +19,43 @@ function LoginForm() {
     setLoading(true)
     setError("")
 
-    const form = new FormData(e.currentTarget)
-    const email = form.get("email") as string
-    const password = form.get("password") as string
-    const pin = form.get("pin") as string
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+    const pin = formData.get("pin") as string
 
-    const result = await signIn("credentials", {
-      email: mode === "email" ? email : undefined,
-      password: mode === "email" ? password : undefined,
-      pin: mode === "pin" ? pin : undefined,
-      redirect: false,
-    })
+    try {
+      const csrfResp = await fetch("/api/auth/csrf")
+      const { csrfToken } = await csrfResp.json()
 
-    if (result?.error) {
-      setError("Credenciales inválidas")
+      const params = new URLSearchParams()
+      params.set("csrfToken", csrfToken)
+      params.set("callbackUrl", callbackUrl)
+      if (mode === "email") {
+        params.set("email", email)
+        params.set("password", password)
+      } else {
+        params.set("pin", pin ?? "")
+      }
+
+      const resp = await fetch("/api/auth/callback/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+        redirect: "follow",
+      })
+
+      if (resp.ok || resp.redirected) {
+        window.location.href = callbackUrl
+      } else {
+        setError("Credenciales inválidas")
+      }
+    } catch {
+      setError("Error de conexión")
+    } finally {
       setLoading(false)
-      return
     }
-
-    router.push(callbackUrl)
-    router.refresh()
   }
 
   return (
@@ -51,6 +66,25 @@ function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === "email" ? (
+            <>
+              <div>
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <Input id="email" name="email" type="email" required className="mt-1" />
+              </div>
+              <div>
+                <label htmlFor="password" className="text-sm font-medium">Contraseña</label>
+                <Input id="password" name="password" type="password" required className="mt-1" />
+              </div>
+            </>
+          ) : (
+            <div>
+              <label htmlFor="pin" className="text-sm font-medium">PIN</label>
+              <Input id="pin" name="pin" type="text" inputMode="numeric" maxLength={6} className="mt-1 text-2xl text-center tracking-widest" placeholder="• • • •" />
+              <p className="text-xs text-muted-foreground mt-1">Ingrese su PIN de 4-6 dígitos</p>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <button
               type="button"
@@ -71,25 +105,6 @@ function LoginForm() {
               PIN
             </button>
           </div>
-
-          {mode === "email" ? (
-            <>
-              <div>
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
-                <Input id="email" name="email" type="email" required className="mt-1" />
-              </div>
-              <div>
-                <label htmlFor="password" className="text-sm font-medium">Contraseña</label>
-                <Input id="password" name="password" type="password" required className="mt-1" />
-              </div>
-            </>
-          ) : (
-            <div>
-              <label htmlFor="pin" className="text-sm font-medium">PIN</label>
-              <Input id="pin" name="pin" type="text" inputMode="numeric" maxLength={6} className="mt-1 text-2xl text-center tracking-widest" placeholder="• • • •" />
-              <p className="text-xs text-muted-foreground mt-1">Ingrese su PIN de 4-6 dígitos</p>
-            </div>
-          )}
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>
