@@ -19,7 +19,7 @@ Cada feature sigue este ciclo obligatorio:
 
 | Feature | Estado | Commit/PR |
 |---|---|---|
-| F1 — Autenticación y Roles | ⏳ Pendiente | — |
+| F1 — Autenticación y Roles | ✅ Completado | `feature/F1-autenticacion` |
 | F2 — Base de datos + Schema (Prisma) | ⏳ Pendiente | — |
 | F3 — API Routes con validación Zod | ⏳ Pendiente | — |
 | F4 — Layout global, loading y error states | ⏳ Pendiente | — |

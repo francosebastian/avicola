@@ -178,14 +178,14 @@ async function main() {
   }
 
   // ─── Formato de cajas ───
-  const categorias = [
-    { categoria: "jumbo", uds: 180 }, { categoria: "super", uds: 100 },
-    { categoria: "extra", uds: 180 }, { categoria: "primera", uds: 180 },
-    { categoria: "segunda", uds: 180 }, { categoria: "tercera", uds: 180 },
+  const formatos = [
+    { categoria: "jumbo", unidadesPorCaja: 180 }, { categoria: "super", unidadesPorCaja: 100 },
+    { categoria: "extra", unidadesPorCaja: 180 }, { categoria: "primera", unidadesPorCaja: 180 },
+    { categoria: "segunda", unidadesPorCaja: 180 }, { categoria: "tercera", unidadesPorCaja: 180 },
   ]
-  for (const c of categorias) {
-    await prisma.formatoCaja.create({ data: c })
-    await prisma.inventarioPacking.create({ data: { categoria: c.categoria, stockCajas: 0, stockUnidades: 0 } })
+  for (const f of formatos) {
+    await prisma.formatoCaja.create({ data: f })
+    await prisma.inventarioPacking.create({ data: { categoria: f.categoria, stockCajas: 0, stockUnidades: 0 } })
   }
 
   // ─── Configuración de alertas ───

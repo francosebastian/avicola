@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
-import { Sidebar } from "@/components/sidebar"
+import { Providers } from "@/components/providers"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,17 +15,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Avícola — Sistema de Gestión Avícola",
-  description: "Prototipo de sistema de gestión para avícola de postura",
+  description: "Sistema de gestión para avícola de postura",
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen bg-background">
-        <Sidebar />
-        <main className="ml-64 min-h-screen p-6">{children}</main>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

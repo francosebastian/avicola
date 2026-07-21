@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: avicola_dev
       POSTGRES_DB: avicola_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,6 +34,7 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://avicola:avicola_dev@postgres:5432/avicola_db?schema=public
+      DATABASE_URL_UNPOOLED: postgresql://avicola:avicola_dev@postgres:5432/avicola_db?schema=public
     depends_on:
       postgres:
         condition: service_healthy
