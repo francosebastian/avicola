@@ -22,7 +22,7 @@ Cada feature sigue este ciclo obligatorio:
 | F1 — Autenticación y Roles | ✅ Completado (proxy omitido en dev) | `feature/F1-autenticacion` |
 | F2 — API Routes con validación Zod | ✅ Completado | `feature/F2-api-routes` |
 | F3 — API Routes con validación Zod | ⏳ Pendiente | — |
-| F4 — Layout global, loading y error states | ⏳ Pendiente | — |
+| F4 — Layout global, loading y error states | ✅ Completado | `feature/F3-loading-error` |
 | F5 — Tipos TypeScript compartidos | ⏳ Pendiente | — |
 | F6 — Formularios funcionales (react-hook-form + Zod) | ⏳ Pendiente | — |
 | F7 — Dashboard con datos reales | ⏳ Pendiente | F4 |
