@@ -1,13 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import { createRegistroPackingSchema } from "@/lib/validations/packing"
 
-const formatos: Record<string, { label: string, uds: number }> = {
+type Seccion = { id: string; nombre: string; galpon: { nombre: string } }
+type Lote = { id: string; codigoLote: string; lineaGenetica: string }
+
+const formatos: Record<string, { label: string; uds: number }> = {
   jumbo: { label: "Jumbo (≥68g)", uds: 180 },
   super: { label: "Super (65-67g)", uds: 100 },
   extra: { label: "Extra (61-64g)", uds: 180 },
@@ -17,55 +25,98 @@ const formatos: Record<string, { label: string, uds: number }> = {
 }
 
 export default function PackingPage() {
+  const router = useRouter()
   const [tab, setTab] = useState<"registro" | "inventario">("registro")
+  const [secciones, setSecciones] = useState<Seccion[]>([])
+  const [lotes, setLotes] = useState<Lote[]>([])
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(createRegistroPackingSchema),
+  })
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/secciones").then(r => r.json()),
+      fetch("/api/lotes").then(r => r.json()),
+    ]).then(([secData, lotData]) => {
+      setSecciones(secData.data || secData || [])
+      setLotes(lotData.data || lotData || [])
+    }).catch(() => toast.error("Error al cargar datos"))
+  }, [])
+
+  async function onSubmit(data: any) {
+    const body: Record<string, unknown> = { ...data }
+    for (const key of Object.keys(body)) {
+      if (["huevosSucio", "huevosRoto", "huevosDescarte", "cajasJumbo", "cajasSuper", "cajasExtra", "cajasPrimera", "cajasSegunda", "cajasTercera"].includes(key)) {
+        body[key] = body[key] === "" ? 0 : Number(body[key])
+      }
+    }
+
+    const res = await fetch("/api/packing/registro", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      toast.error(err.error || "Error al guardar registro de packing")
+      return
+    }
+
+    toast.success("Packing registrado correctamente")
+    router.refresh()
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Packing y Clasificación de Huevos</h1>
-          <p className="text-muted-foreground text-sm">Registro diario por cajas — Lunes 20 Julio 2026</p>
+          <p className="text-muted-foreground text-sm">Registro diario por cajas</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/despacho"><Button variant="outline">Ir a Despachos</Button></Link>
-          <Button>Confirmar Packing</Button>
+          <Link href="/despacho"><Button type="button" variant="outline">Ir a Despachos</Button></Link>
         </div>
       </div>
 
       <div className="flex gap-2 border-b pb-2">
-        <button onClick={() => setTab("registro")} className={`px-4 py-2 text-sm font-medium rounded-t-md ${tab === "registro" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>Registro de Packing</button>
-        <button onClick={() => setTab("inventario")} className={`px-4 py-2 text-sm font-medium rounded-t-md ${tab === "inventario" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>Inventario Acumulado</button>
+        <button type="button" onClick={() => setTab("registro")} className={`px-4 py-2 text-sm font-medium rounded-t-md ${tab === "registro" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>Registro de Packing</button>
+        <button type="button" onClick={() => setTab("inventario")} className={`px-4 py-2 text-sm font-medium rounded-t-md ${tab === "inventario" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>Inventario Acumulado</button>
       </div>
 
       {tab === "registro" && (
-        <>
-          <div className="grid grid-cols-4 gap-4">
-            <Card><CardHeader className="pb-2"><CardTitle className="text-xs text-muted-foreground">Total Procesado</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">4,520</p><p className="text-xs text-muted-foreground">unidades hoy</p></CardContent></Card>
-            <Card><CardHeader className="pb-2"><CardTitle className="text-xs text-muted-foreground">Total Clasificado</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold text-green-700">4,488</p><p className="text-xs text-muted-foreground">99.3% del total</p></CardContent></Card>
-            <Card><CardHeader className="pb-2"><CardTitle className="text-xs text-muted-foreground">Merma</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold text-amber-600">32</p><p className="text-xs text-muted-foreground">sucio + roto + descarte</p></CardContent></Card>
-            <Card><CardHeader className="pb-2"><CardTitle className="text-xs text-muted-foreground">% Merma</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">0.7%</p><p className="text-xs text-muted-foreground text-green-700">objetivo: &lt;1.0% ✓</p></CardContent></Card>
-          </div>
-
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-6">
             <Card>
               <CardHeader><CardTitle>Seleccionar Origen</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium">Lote</label>
-                    <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
-                      <option>H-032 — Hy-Line Brown</option>
-                      <option>H-033 — Hy-Line Brown</option>
-                      <option>H-035 — ISA Brown</option>
+                    <label htmlFor="loteId" className="text-sm font-medium">Lote</label>
+                    <select id="loteId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("loteId")}>
+                      <option value="">Seleccionar...</option>
+                      {lotes.map(l => (
+                        <option key={l.id} value={l.id}>{l.codigoLote} — {l.lineaGenetica}</option>
+                      ))}
                     </select>
+                    {errors.loteId && <p className="text-sm text-red-600 mt-1">{errors.loteId.message as string}</p>}
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Sección</label>
-                    <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
-                      <option>Galpón 1 — Fila A</option>
-                      <option>Galpón 1 — Fila B</option>
-                      <option>Galpón 1 — Fila C</option>
+                    <label htmlFor="seccionId" className="text-sm font-medium">Sección</label>
+                    <select id="seccionId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("seccionId")}>
+                      <option value="">Seleccionar...</option>
+                      {secciones.map(s => (
+                        <option key={s.id} value={s.id}>{s.galpon?.nombre || ""} — {s.nombre}</option>
+                      ))}
                     </select>
+                    {errors.seccionId && <p className="text-sm text-red-600 mt-1">{errors.seccionId.message as string}</p>}
                   </div>
+                </div>
+                <div>
+                  <label htmlFor="fecha" className="text-sm font-medium">Fecha</label>
+                  <Input id="fecha" type="date" className="mt-1" {...register("fecha")} />
+                  {errors.fecha && <p className="text-sm text-red-600 mt-1">{errors.fecha.message as string}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -90,31 +141,40 @@ export default function PackingPage() {
                 <div className="space-y-4 p-4 rounded-lg border border-red-200 bg-red-50">
                   <h3 className="font-semibold text-sm text-red-700">No Clasificables</h3>
                   <div>
-                    <label className="text-sm">Huevos Sucios (uds)</label>
-                    <Input type="number" defaultValue={12} className="mt-1" />
+                    <label htmlFor="huevosSucio" className="text-sm">Huevos Sucios (uds)</label>
+                    <Input id="huevosSucio" type="number" className="mt-1" {...register("huevosSucio", { setValueAs: v => v === "" ? 0 : Number(v) })} />
+                    {errors.huevosSucio && <p className="text-xs text-red-600 mt-1">{errors.huevosSucio.message as string}</p>}
                   </div>
                   <div>
-                    <label className="text-sm">Huevos Rotos (uds)</label>
-                    <Input type="number" defaultValue={15} className="mt-1" />
+                    <label htmlFor="huevosRoto" className="text-sm">Huevos Rotos (uds)</label>
+                    <Input id="huevosRoto" type="number" className="mt-1" {...register("huevosRoto", { setValueAs: v => v === "" ? 0 : Number(v) })} />
+                    {errors.huevosRoto && <p className="text-xs text-red-600 mt-1">{errors.huevosRoto.message as string}</p>}
                   </div>
                   <div>
-                    <label className="text-sm">Descarte (uds)</label>
-                    <Input type="number" defaultValue={5} className="mt-1" />
+                    <label htmlFor="huevosDescarte" className="text-sm">Descarte (uds)</label>
+                    <Input id="huevosDescarte" type="number" className="mt-1" {...register("huevosDescarte", { setValueAs: v => v === "" ? 0 : Number(v) })} />
+                    {errors.huevosDescarte && <p className="text-xs text-red-600 mt-1">{errors.huevosDescarte.message as string}</p>}
                   </div>
                 </div>
 
                 <div className="space-y-4 p-4 rounded-lg border border-green-200 bg-green-50">
                   <h3 className="font-semibold text-sm text-green-700">Clasificación por Cajas</h3>
                   <div className="grid grid-cols-2 gap-3">
-                    {Object.entries(formatos).map(([key, f]) => (
-                      <div key={key}>
-                        <label className="text-sm">{f.label}</label>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Input type="number" placeholder="cajas" className="flex-1" />
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">×{f.uds}</span>
+                    {Object.entries(formatos).map(([key, f]) => {
+                      const fieldName = `cajas${key.charAt(0).toUpperCase() + key.slice(1)}`
+                      return (
+                        <div key={key}>
+                          <label htmlFor={fieldName} className="text-sm">{f.label}</label>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Input id={fieldName} type="number" placeholder="cajas" className="flex-1" {...register(fieldName as any, { setValueAs: v => v === "" ? 0 : Number(v) })} />
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">×{f.uds}</span>
+                          </div>
+                          {errors[fieldName as keyof typeof errors] && (
+                            <p className="text-xs text-red-600 mt-1">{errors[fieldName as keyof typeof errors]?.message as string}</p>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
 
@@ -123,12 +183,8 @@ export default function PackingPage() {
                   <div className="space-y-3">
                     <div className="text-center py-4 border-b">
                       <p className="text-sm text-muted-foreground">Total Clasificado</p>
-                      <p className="text-4xl font-bold text-green-700">4,488 uds</p>
-                      <p className="text-xs text-muted-foreground mt-1">equivalente a ~25 cajas</p>
-                    </div>
-                    <div className="text-center py-3">
-                      <p className="text-sm text-muted-foreground">Merma del día</p>
-                      <p className="text-xl font-bold text-amber-600">32 uds (0.7%)</p>
+                      <p className="text-4xl font-bold text-green-700">— uds</p>
+                      <p className="text-xs text-muted-foreground mt-1">Los totales se calculan al guardar</p>
                     </div>
                     <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
                       Al confirmar, se suman cajas y unidades al inventario acumulado de packing.
@@ -137,9 +193,8 @@ export default function PackingPage() {
                 </div>
               </div>
 
-              <div className="mt-6">
-                <label className="text-sm font-medium">Observaciones</label>
-                <textarea className="w-full mt-1 rounded-md border p-2 text-sm bg-background" rows={2} placeholder="Ej: lotes de extra con alta producción hoy..." />
+              <div className="mt-6 flex justify-end gap-2">
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Guardando..." : "Confirmar Packing"}</Button>
               </div>
             </CardContent>
           </Card>
@@ -174,7 +229,7 @@ export default function PackingPage() {
               </table>
             </CardContent>
           </Card>
-        </>
+        </form>
       )}
 
       {tab === "inventario" && (
@@ -183,7 +238,7 @@ export default function PackingPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Inventario Acumulado de Packing</CardTitle>
-                <Badge variant="outline">Actualizado: 20 Jul 2026 16:30</Badge>
+                <Badge variant="outline">Actualizado: —</Badge>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -209,8 +264,8 @@ export default function PackingPage() {
                       <td className="p-3">{item.cajas.toLocaleString()}</td>
                       <td className="p-3">{item.uds.toLocaleString()}</td>
                       <td className="p-3 text-sm text-muted-foreground">{item.fmt}</td>
-                      <td className="p-3 text-green-700">++</td>
-                      <td className="p-3 text-red-600">--</td>
+                      <td className="p-3 text-green-700">—</td>
+                      <td className="p-3 text-red-600">—</td>
                       <td className="p-3 font-medium">Disponible</td>
                     </tr>
                   ))}
@@ -218,10 +273,6 @@ export default function PackingPage() {
               </table>
             </CardContent>
           </Card>
-
-          <div className="text-sm text-muted-foreground text-center p-4 bg-muted rounded-lg">
-            <p>Entradas y salidas del día se actualizan automáticamente al confirmar packing o registrar despachos.</p>
-          </div>
         </>
       )}
     </div>

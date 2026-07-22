@@ -24,7 +24,7 @@ Cada feature sigue este ciclo obligatorio:
 | F3 — API Routes con validación Zod | ⏳ Pendiente | — |
 | F4 — Layout global, loading y error states | ✅ Completado | `feature/F3-loading-error` |
 | F5 — Tipos TypeScript compartidos | ✅ Completado | `feature/F5-tipos-compartidos` |
-| F6 — Formularios funcionales (react-hook-form + Zod) | ⏳ Pendiente | — |
+| F6 — Formularios funcionales (react-hook-form + Zod) | ✅ Completado | `feature/F6-formularios` |
 | F7 — Dashboard con datos reales | ⏳ Pendiente | F4 |
 | F8 — Gestión de Lotes (CRUD) | ⏳ Pendiente | F5 |
 | F9 — Registro Diario de Producción | ⏳ Pendiente | F5 |

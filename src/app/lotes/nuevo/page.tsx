@@ -1,20 +1,67 @@
 "use client"
 
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import Link from "next/link"
+import { createLoteSchema } from "@/lib/validations/lotes"
+
+type Seccion = { id: string; nombre: string; galpon: { nombre: string } }
 
 export default function NuevoLotePage() {
+  const router = useRouter()
+  const [secciones, setSecciones] = useState<Seccion[]>([])
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(createLoteSchema),
+  })
+
+  useEffect(() => {
+    fetch("/api/secciones")
+      .then(res => res.json())
+      .then(data => setSecciones(data.data || data))
+      .catch(() => toast.error("Error al cargar secciones"))
+  }, [])
+
+  async function onSubmit(data: any) {
+    const body = {
+      ...data,
+      cantidadInicial: Number(data.cantidadInicial),
+      pesoInicialPromedio: data.pesoInicialPromedio ? Number(data.pesoInicialPromedio) : undefined,
+      costoPollitaUnitario: data.costoPollitaUnitario ? Number(data.costoPollitaUnitario) : undefined,
+    }
+
+    const res = await fetch("/api/lotes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      toast.error(err.error || "Error al guardar el lote")
+      return
+    }
+
+    toast.success("Lote creado correctamente")
+    router.push("/lotes")
+    router.refresh()
+  }
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Nuevo Lote</h1>
           <p className="text-muted-foreground text-sm">Registro de recepción de pollitas BB</p>
         </div>
         <Link href="/lotes">
-          <Button variant="outline">Cancelar</Button>
+          <Button variant="outline" type="button">Cancelar</Button>
         </Link>
       </div>
 
@@ -23,30 +70,34 @@ export default function NuevoLotePage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Código del Lote <span className="text-red-500">*</span></label>
-              <Input placeholder="Ej: H-036" className="mt-1" />
+              <label htmlFor="codigoLote" className="text-sm font-medium">Código del Lote <span className="text-red-500">*</span></label>
+              <Input id="codigoLote" placeholder="Ej: H-036" className="mt-1" {...register("codigoLote")} />
+              {errors.codigoLote && <p className="text-sm text-red-600 mt-1">{errors.codigoLote.message as string}</p>}
               <p className="text-xs text-muted-foreground mt-1">Autogenerado o manual. Único en el sistema.</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Línea Genética <span className="text-red-500">*</span></label>
-              <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
-                <option>Hy-Line Brown</option>
-                <option>Hy-Line W36</option>
-                <option>Lohmann LSL</option>
-                <option>Lohmann Brown</option>
-                <option>ISA Brown</option>
-                <option>Bovans White</option>
+              <label htmlFor="lineaGenetica" className="text-sm font-medium">Línea Genética <span className="text-red-500">*</span></label>
+              <select id="lineaGenetica" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("lineaGenetica")}>
+                <option value="">Seleccionar...</option>
+                <option value="Hy-Line Brown">Hy-Line Brown</option>
+                <option value="Hy-Line W36">Hy-Line W36</option>
+                <option value="Lohmann LSL">Lohmann LSL</option>
+                <option value="Lohmann Brown">Lohmann Brown</option>
+                <option value="ISA Brown">ISA Brown</option>
+                <option value="Bovans White">Bovans White</option>
               </select>
+              {errors.lineaGenetica && <p className="text-sm text-red-600 mt-1">{errors.lineaGenetica.message as string}</p>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Proveedor de Pollitas</label>
-              <Input placeholder="Nombre del proveedor" className="mt-1" />
+              <label htmlFor="proveedorPollita" className="text-sm font-medium">Proveedor de Pollitas</label>
+              <Input id="proveedorPollita" placeholder="Nombre del proveedor" className="mt-1" {...register("proveedorPollita")} />
             </div>
             <div>
-              <label className="text-sm font-medium">Costo por Pollita ($)</label>
-              <Input type="number" placeholder="Ej: 3850" className="mt-1" />
+              <label htmlFor="costoPollitaUnitario" className="text-sm font-medium">Costo por Pollita ($)</label>
+              <Input id="costoPollitaUnitario" type="number" step="0.01" placeholder="Ej: 3850" className="mt-1" {...register("costoPollitaUnitario", { setValueAs: v => v === "" ? undefined : Number(v) })} />
+              {errors.costoPollitaUnitario && <p className="text-sm text-red-600 mt-1">{errors.costoPollitaUnitario.message as string}</p>}
             </div>
           </div>
         </CardContent>
@@ -57,26 +108,26 @@ export default function NuevoLotePage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium">Fecha de Recepción <span className="text-red-500">*</span></label>
-              <Input type="date" className="mt-1" />
+              <label htmlFor="fechaRecepcion" className="text-sm font-medium">Fecha de Recepción <span className="text-red-500">*</span></label>
+              <Input id="fechaRecepcion" type="date" className="mt-1" {...register("fechaRecepcion")} />
+              {errors.fechaRecepcion && <p className="text-sm text-red-600 mt-1">{errors.fechaRecepcion.message as string}</p>}
             </div>
             <div>
-              <label className="text-sm font-medium">Fecha de Nacimiento</label>
-              <Input type="date" className="mt-1" />
+              <label htmlFor="fechaNacimiento" className="text-sm font-medium">Fecha de Nacimiento</label>
+              <Input id="fechaNacimiento" type="date" className="mt-1" {...register("fechaNacimiento")} />
+              {errors.fechaNacimiento && <p className="text-sm text-red-600 mt-1">{errors.fechaNacimiento.message as string}</p>}
             </div>
             <div>
-              <label className="text-sm font-medium">Cantidad Inicial <span className="text-red-500">*</span></label>
-              <Input type="number" placeholder="Ej: 5000" className="mt-1" />
+              <label htmlFor="cantidadInicial" className="text-sm font-medium">Cantidad Inicial <span className="text-red-500">*</span></label>
+              <Input id="cantidadInicial" type="number" placeholder="Ej: 5000" className="mt-1" {...register("cantidadInicial", { valueAsNumber: true })} />
+              {errors.cantidadInicial && <p className="text-sm text-red-600 mt-1">{errors.cantidadInicial.message as string}</p>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Peso Inicial Promedio (g)</label>
-              <Input type="number" step="0.1" placeholder="Ej: 35.2" className="mt-1" />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Edad a la Recepción (días)</label>
-              <Input type="number" placeholder="Ej: 1 (pollita BB)" className="mt-1" />
+              <label htmlFor="pesoInicialPromedio" className="text-sm font-medium">Peso Inicial Promedio (g)</label>
+              <Input id="pesoInicialPromedio" type="number" step="0.1" placeholder="Ej: 35.2" className="mt-1" {...register("pesoInicialPromedio", { setValueAs: v => v === "" ? undefined : Number(v) })} />
+              {errors.pesoInicialPromedio && <p className="text-sm text-red-600 mt-1">{errors.pesoInicialPromedio.message as string}</p>}
             </div>
           </div>
         </CardContent>
@@ -87,27 +138,15 @@ export default function NuevoLotePage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Galpón <span className="text-red-500">*</span></label>
-              <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
-                <option>Galpón 1</option>
-                <option>Galpón 2</option>
-                <option>Galpón 3</option>
+              <label htmlFor="seccionId" className="text-sm font-medium">Sección <span className="text-red-500">*</span></label>
+              <select id="seccionId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("seccionId")}>
+                <option value="">Seleccionar...</option>
+                {secciones.map(s => (
+                  <option key={s.id} value={s.id}>{s.galpon?.nombre || ""} — {s.nombre}</option>
+                ))}
               </select>
+              {errors.seccionId && <p className="text-sm text-red-600 mt-1">{errors.seccionId.message as string}</p>}
             </div>
-            <div>
-              <label className="text-sm font-medium">Sección <span className="text-red-500">*</span></label>
-              <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
-                <option>Fila A</option>
-                <option>Fila B</option>
-                <option>Fila C</option>
-                <option>Ala Norte</option>
-                <option>Ala Sur</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Observaciones</label>
-            <textarea className="w-full mt-1 rounded-md border p-2 text-sm bg-background" rows={3} placeholder="Ej: pollitas de buena calidad, peso homogéneo..." />
           </div>
         </CardContent>
       </Card>
@@ -139,10 +178,10 @@ export default function NuevoLotePage() {
 
       <div className="flex justify-end gap-3">
         <Link href="/lotes">
-          <Button variant="outline">Cancelar</Button>
+          <Button variant="outline" type="button">Cancelar</Button>
         </Link>
-        <Button>Crear Lote</Button>
+        <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Guardando..." : "Crear Lote"}</Button>
       </div>
-    </div>
+    </form>
   )
 }
