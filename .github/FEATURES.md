@@ -20,7 +20,7 @@ Cada feature sigue este ciclo obligatorio:
 | Feature | Estado | Commit/PR |
 |---|---|---|
 | F1 — Autenticación y Roles | ✅ Completado (proxy omitido en dev) | `feature/F1-autenticacion` |
-| F2 — Base de datos + Schema (Prisma) | ⏳ Pendiente | — |
+| F2 — API Routes con validación Zod | ✅ Completado | `feature/F2-api-routes` |
 | F3 — API Routes con validación Zod | ⏳ Pendiente | — |
 | F4 — Layout global, loading y error states | ⏳ Pendiente | — |
 | F5 — Tipos TypeScript compartidos | ⏳ Pendiente | — |
