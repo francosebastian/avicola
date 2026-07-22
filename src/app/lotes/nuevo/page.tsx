@@ -23,8 +23,8 @@ export default function NuevoLotePage() {
 
   useEffect(() => {
     fetch("/api/secciones")
-      .then(res => res.json())
-      .then(data => setSecciones(data.data || data))
+      .then(res => { if (!res.ok) throw new Error(); return res.json() })
+      .then(setSecciones)
       .catch(() => toast.error("Error al cargar secciones"))
   }, [])
 
