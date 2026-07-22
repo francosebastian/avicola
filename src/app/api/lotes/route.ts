@@ -9,16 +9,18 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "20")
     const skip = (page - 1) * limit
-
     const where = estado ? { estado } : {}
 
     const [data, total] = await Promise.all([
-      prisma.lote.findMany({ where, skip, take: limit, orderBy: { createdAt: "desc" } }),
+      prisma.lote.findMany({
+        where, skip, take: limit, orderBy: { createdAt: "desc" },
+        include: { seccion: { include: { galpon: { select: { nombre: true } } } } },
+      }),
       prisma.lote.count({ where }),
     ])
 
     return NextResponse.json({ data, total, page, limit })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 })
   }
 }
@@ -30,9 +32,19 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
-    const data = await prisma.lote.create({ data: parsed.data as any })
-    return NextResponse.json(data, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: "Error interno" }, { status: 500 })
+
+    const data = {
+      ...parsed.data,
+      fechaRecepcion: new Date(parsed.data.fechaRecepcion),
+      fechaNacimiento: parsed.data.fechaNacimiento ? new Date(parsed.data.fechaNacimiento) : undefined,
+      pesoInicialPromedio: parsed.data.pesoInicialPromedio ?? undefined,
+      costoPollitaUnitario: parsed.data.costoPollitaUnitario ?? undefined,
+    }
+
+    const lote = await prisma.lote.create({ data: data as any })
+    return NextResponse.json(lote, { status: 201 })
+  } catch (error: any) {
+    console.error("[LOTE] error:", error?.message || error)
+    return NextResponse.json({ error: error?.message || "Error interno" }, { status: 500 })
   }
 }
