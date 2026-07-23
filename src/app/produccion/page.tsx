@@ -3,8 +3,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState, Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,13 +23,15 @@ type LoteInfo = {
   seccion: string | null
 }
 
-export default function ProduccionPage() {
+function ProduccionForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [secciones, setSecciones] = useState<Seccion[]>([])
   const [lotes, setLotes] = useState<LoteInfo[]>([])
   const [loteSeleccionado, setLoteSeleccionado] = useState<LoteInfo | null>(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm({
     resolver: zodResolver(createRegistroDiarioSchema),
   })
 
@@ -40,8 +42,24 @@ export default function ProduccionPage() {
     ]).then(([secData, lotData]) => {
       setSecciones(secData || [])
       setLotes(lotData.data || lotData || [])
+      setDataLoaded(true)
     }).catch(() => toast.error("Error al cargar datos"))
   }, [])
+
+  // Auto-select from QR scan
+  useEffect(() => {
+    if (!dataLoaded) return
+    const galponQr = searchParams.get("galpon")
+    const seccionQr = searchParams.get("seccion")
+    if (galponQr && seccionQr) {
+      const match = secciones.find(
+        s => s.nombre === seccionQr && s.galpon?.nombre === galponQr
+      )
+      if (match) {
+        setValue("seccionId", match.id)
+      }
+    }
+  }, [dataLoaded, searchParams, secciones, setValue])
 
   const seccionId = watch("seccionId")
   useEffect(() => {
@@ -230,5 +248,13 @@ export default function ProduccionPage() {
         </CardContent>
       </Card>
     </form>
+  )
+}
+
+export default function ProduccionPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-muted-foreground">Cargando...</div>}>
+      <ProduccionForm />
+    </Suspense>
   )
 }

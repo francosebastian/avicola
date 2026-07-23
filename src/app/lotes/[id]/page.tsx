@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { QRCodeSVG } from "qrcode.react"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -46,6 +47,11 @@ export default function LoteDetailPage() {
   const id = params.id as string
   const [lote, setLote] = useState<LoteFull | null>(null)
   const [loading, setLoading] = useState(true)
+  const [origin, setOrigin] = useState("")
+
+  useEffect(() => {
+    setOrigin(window.location.origin)
+  }, [])
 
   useEffect(() => {
     if (!id) return
@@ -207,6 +213,38 @@ export default function LoteDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* QR Code - Printable */}
+      {lote.galpon && lote.seccion && (
+        <Card id="qr-section" className="print:block hidden print:block">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Código QR — Lote {lote.codigoLote}
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto print:hidden"
+                onClick={() => window.print()}
+              >
+                Imprimir QR
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-4 py-6">
+            <QRCodeSVG
+              value={`${origin || "http://localhost:3000"}/produccion?galpon=${encodeURIComponent(lote.galpon)}&seccion=${encodeURIComponent(lote.seccion)}`}
+              size={200}
+              level="M"
+            />
+            <div className="text-center text-sm text-muted-foreground">
+              <p>Escanee para registrar producción diaria</p>
+              <p className="text-xs mt-1">
+                {lote.galpon} / {lote.seccion} — {lote.codigoLote}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
