@@ -88,11 +88,15 @@ export default function LotesPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">
-              Registrados
+              Edad Promedio
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{lotes.length}</p>
+            <p className="text-3xl font-bold">
+              {lotes.length > 0
+                ? Math.round(lotes.reduce((s, l) => s + l.edadSemanas, 0) / lotes.length) + " sem"
+                : "—"}
+            </p>
           </CardContent>
         </Card>
       </div>
