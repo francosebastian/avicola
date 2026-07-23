@@ -11,10 +11,12 @@ interface LoteRow {
   id: string
   codigoLote: string
   lineaGenetica: string
-  seccionId: string
   cantidadInicial: number
   estado: string
-  fechaRecepcion: string
+  edadSemanas: number
+  postura: number
+  galpon: string | null
+  seccion: string | null
 }
 
 export default function LotesPage() {
@@ -102,7 +104,10 @@ export default function LotesPage() {
               <tr className="border-b text-left text-sm text-muted-foreground">
                 <th className="p-3 font-medium">Código</th>
                 <th className="p-3 font-medium">Línea Genética</th>
+                <th className="p-3 font-medium">Galpón / Sección</th>
+                <th className="p-3 font-medium">Edad</th>
                 <th className="p-3 font-medium">Aves</th>
+                <th className="p-3 font-medium">Postura</th>
                 <th className="p-3 font-medium">Estado</th>
                 <th className="p-3 font-medium"></th>
               </tr>
@@ -110,7 +115,7 @@ export default function LotesPage() {
             <tbody>
               {lotes.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                  <td colSpan={8} className="p-6 text-center text-muted-foreground">
                     No hay lotes registrados
                   </td>
                 </tr>
@@ -119,7 +124,14 @@ export default function LotesPage() {
                 <tr key={l.id} className="border-b last:border-0 hover:bg-muted/50">
                   <td className="p-3 font-medium">{l.codigoLote}</td>
                   <td className="p-3">{l.lineaGenetica}</td>
+                  <td className="p-3 text-sm">
+                    {l.galpon && l.seccion ? `${l.galpon} / ${l.seccion}` : "—"}
+                  </td>
+                  <td className="p-3">{l.edadSemanas} sem</td>
                   <td className="p-3">{l.cantidadInicial.toLocaleString()}</td>
+                  <td className="p-3">
+                    {l.postura > 0 ? `${l.postura}%` : "—"}
+                  </td>
                   <td className="p-3">
                     <Badge
                       variant={l.estado === "postura" ? "default" : "secondary"}

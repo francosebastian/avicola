@@ -7,18 +7,44 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const estado = searchParams.get("estado")
     const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "20")
-    const skip = (page - 1) * limit
+    const limit = parseInt(searchParams.get("limit") || "100")
     const where = estado ? { estado } : {}
 
-    const [data, total] = await Promise.all([
-      prisma.lote.findMany({
-        where, skip, take: limit, orderBy: { createdAt: "desc" },
-        include: { seccion: { include: { galpon: { select: { nombre: true } } } } },
-      }),
-      prisma.lote.count({ where }),
-    ])
+    const lotes = await prisma.lote.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        seccion: { include: { galpon: { select: { nombre: true } } } },
+        registroDiario: { orderBy: { fecha: "desc" }, take: 1 },
+      },
+    })
 
+    const today = new Date()
+    const data = lotes.map((l) => {
+      const fechaRecepcion = new Date(l.fechaRecepcion)
+      const diffWeeks = Math.floor((today.getTime() - fechaRecepcion.getTime()) / (7 * 24 * 60 * 60 * 1000))
+      const ultimoRegistro = l.registroDiario[0]
+      const postura = ultimoRegistro?.avesVivas
+        ? Math.round((ultimoRegistro.huevosProducidos ?? 0) / ultimoRegistro.avesVivas * 1000) / 10
+        : 0
+
+      return {
+        id: l.id,
+        codigoLote: l.codigoLote,
+        lineaGenetica: l.lineaGenetica,
+        cantidadInicial: l.cantidadInicial,
+        estado: l.estado,
+        fechaRecepcion: l.fechaRecepcion,
+        edadSemanas: diffWeeks,
+        postura,
+        galpon: l.seccion?.galpon?.nombre ?? null,
+        seccion: l.seccion?.nombre ?? null,
+      }
+    })
+
+    const total = await prisma.lote.count({ where })
     return NextResponse.json({ data, total, page, limit })
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 })
