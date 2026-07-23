@@ -43,22 +43,27 @@ export default function ProduccionPage() {
     }).catch(() => toast.error("Error al cargar datos"))
   }, [])
 
-  const loteId = watch("loteId")
+  const seccionId = watch("seccionId")
   useEffect(() => {
-    if (loteId) {
-      const encontrado = lotes.find(l => l.id === loteId) ?? null
+    if (seccionId) {
+      const seccion = secciones.find(s => s.id === seccionId)
+      const encontrado = lotes.find(l => l.seccion === seccion?.nombre && l.galpon === seccion?.galpon?.nombre) ?? null
       setLoteSeleccionado(encontrado)
     } else {
       setLoteSeleccionado(null)
     }
-  }, [loteId, lotes])
+  }, [seccionId, secciones, lotes])
 
   const hoy = new Date().toLocaleDateString("es-CL", {
     weekday: "long", year: "numeric", month: "long", day: "numeric"
   })
 
   async function onSubmit(data: any) {
-    const body: Record<string, unknown> = { ...data }
+    const body: Record<string, unknown> = {
+      ...data,
+      fecha: new Date().toISOString().split("T")[0],
+      loteId: loteSeleccionado?.id ?? data.loteId,
+    }
     for (const key of Object.keys(body)) {
       if (["avesVivas", "bajasDia", "huevosProducidos", "huevosJumbo", "huevosSuper", "huevosExtra", "huevosPrimera", "huevosSegunda", "huevosTercera", "huevosSubproducto"].includes(key)) {
         body[key] = body[key] === "" ? undefined : Number(body[key])
@@ -104,30 +109,29 @@ export default function ProduccionPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="loteId" className="text-sm font-medium">Lote</label>
-                <select id="loteId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("loteId")}>
+                <label htmlFor="galpon" className="text-sm font-medium">Galpón</label>
+                <select id="galpon" className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
                   <option value="">Seleccionar...</option>
-                  {lotes.map(l => (
-                    <option key={l.id} value={l.id}>{l.codigoLote} — {l.lineaGenetica}</option>
+                  {[...new Map(secciones.map(s => [s.galpon?.nombre, s.galpon?.nombre])).values()].filter(Boolean).map(g => (
+                    <option key={g} value={g!}>{g}</option>
                   ))}
                 </select>
-                {errors.loteId && <p className="text-sm text-red-600 mt-1">{errors.loteId.message as string}</p>}
               </div>
               <div>
                 <label htmlFor="seccionId" className="text-sm font-medium">Sección</label>
                 <select id="seccionId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("seccionId")}>
                   <option value="">Seleccionar...</option>
                   {secciones.map(s => (
-                    <option key={s.id} value={s.id}>{s.galpon?.nombre || ""} — {s.nombre}</option>
+                    <option key={s.id} value={s.id}>
+                      {s.nombre}
+                      {lotes.find(l => l.seccion === s.nombre && l.galpon === s.galpon?.nombre)
+                        ? ` — ${lotes.find(l => l.seccion === s.nombre && l.galpon === s.galpon?.nombre)?.codigoLote}`
+                        : ""}
+                    </option>
                   ))}
                 </select>
                 {errors.seccionId && <p className="text-sm text-red-600 mt-1">{errors.seccionId.message as string}</p>}
               </div>
-            </div>
-            <div>
-              <label htmlFor="fecha" className="text-sm font-medium">Fecha</label>
-              <Input id="fecha" type="date" className="mt-1" {...register("fecha")} />
-              {errors.fecha && <p className="text-sm text-red-600 mt-1">{errors.fecha.message as string}</p>}
             </div>
           </CardContent>
         </Card>
