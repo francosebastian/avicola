@@ -216,7 +216,7 @@ export default function LoteDetailPage() {
 
       {/* QR Code - Printable */}
       {lote.galpon && lote.seccion && (
-        <Card id="qr-section" className="print:block hidden print:block">
+        <Card id="qr-section" className="">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               Código QR — Lote {lote.codigoLote}
