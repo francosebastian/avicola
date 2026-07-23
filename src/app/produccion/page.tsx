@@ -11,12 +11,23 @@ import { Input } from "@/components/ui/input"
 import { createRegistroDiarioSchema } from "@/lib/validations/produccion"
 
 type Seccion = { id: string; nombre: string; galpon: { nombre: string } }
-type Lote = { id: string; codigoLote: string; lineaGenetica: string }
+type LoteInfo = {
+  id: string
+  codigoLote: string
+  lineaGenetica: string
+  cantidadInicial: number
+  avesVivas: number
+  postura: number
+  edadSemanas: number
+  galpon: string | null
+  seccion: string | null
+}
 
 export default function ProduccionPage() {
   const router = useRouter()
   const [secciones, setSecciones] = useState<Seccion[]>([])
-  const [lotes, setLotes] = useState<Lote[]>([])
+  const [lotes, setLotes] = useState<LoteInfo[]>([])
+  const [loteSeleccionado, setLoteSeleccionado] = useState<LoteInfo | null>(null)
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm({
     resolver: zodResolver(createRegistroDiarioSchema),
@@ -27,10 +38,24 @@ export default function ProduccionPage() {
       fetch("/api/secciones").then(r => r.json()),
       fetch("/api/lotes").then(r => r.json()),
     ]).then(([secData, lotData]) => {
-      setSecciones(secData.data || secData || [])
+      setSecciones(secData || [])
       setLotes(lotData.data || lotData || [])
     }).catch(() => toast.error("Error al cargar datos"))
   }, [])
+
+  const loteId = watch("loteId")
+  useEffect(() => {
+    if (loteId) {
+      const encontrado = lotes.find(l => l.id === loteId) ?? null
+      setLoteSeleccionado(encontrado)
+    } else {
+      setLoteSeleccionado(null)
+    }
+  }, [loteId, lotes])
+
+  const hoy = new Date().toLocaleDateString("es-CL", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  })
 
   async function onSubmit(data: any) {
     const body: Record<string, unknown> = { ...data }
@@ -64,9 +89,13 @@ export default function ProduccionPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Registro Diario de Producción</h1>
-          <p className="text-muted-foreground text-sm">Registro por sección</p>
+          <p className="text-muted-foreground text-sm">
+            Registro por sección — {hoy}
+          </p>
         </div>
-        <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Guardando..." : "Guardar Registro"}</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Guardando..." : "Guardar Registro"}
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
@@ -106,12 +135,24 @@ export default function ProduccionPage() {
         <Card>
           <CardHeader><CardTitle>Resumen del Lote</CardTitle></CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <span className="text-muted-foreground">Lote seleccionado:</span>
-              <span className="font-medium">{lotes.find(l => l.id === watch("loteId"))?.codigoLote || "—"}</span>
-              <span className="text-muted-foreground">Sección:</span>
-              <span className="font-medium">{secciones.find(s => s.id === watch("seccionId"))?.nombre || "—"}</span>
-            </div>
+            {loteSeleccionado ? (
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <span className="text-muted-foreground">Lote:</span>
+                <span className="font-medium">{loteSeleccionado.codigoLote}</span>
+                <span className="text-muted-foreground">Línea:</span>
+                <span className="font-medium">{loteSeleccionado.lineaGenetica}</span>
+                <span className="text-muted-foreground">Edad:</span>
+                <span className="font-medium">{loteSeleccionado.edadSemanas} semanas</span>
+                <span className="text-muted-foreground">Aves iniciales:</span>
+                <span className="font-medium">{loteSeleccionado.cantidadInicial.toLocaleString()}</span>
+                <span className="text-muted-foreground">Aves vivas:</span>
+                <span className="font-medium">{loteSeleccionado.avesVivas.toLocaleString()}</span>
+                <span className="text-muted-foreground">Postura esperada:</span>
+                <span className="font-medium">{loteSeleccionado.postura > 0 ? `${loteSeleccionado.postura}%` : "—"}</span>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Seleccione un lote para ver su resumen</p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -159,41 +200,21 @@ export default function ProduccionPage() {
 
           <h3 className="text-sm font-medium mt-6 mb-3">Clasificación de Huevos</h3>
           <div className="grid grid-cols-7 gap-4">
-            <div>
-              <label htmlFor="huevosJumbo" className="text-xs text-muted-foreground">Jumbo</label>
-              <Input id="huevosJumbo" type="number" className="mt-1" {...register("huevosJumbo", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosJumbo && <p className="text-xs text-red-600 mt-1">{errors.huevosJumbo.message as string}</p>}
-            </div>
-            <div>
-              <label htmlFor="huevosSuper" className="text-xs text-muted-foreground">Súper</label>
-              <Input id="huevosSuper" type="number" className="mt-1" {...register("huevosSuper", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosSuper && <p className="text-xs text-red-600 mt-1">{errors.huevosSuper.message as string}</p>}
-            </div>
-            <div>
-              <label htmlFor="huevosExtra" className="text-xs text-muted-foreground">Extra</label>
-              <Input id="huevosExtra" type="number" className="mt-1" {...register("huevosExtra", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosExtra && <p className="text-xs text-red-600 mt-1">{errors.huevosExtra.message as string}</p>}
-            </div>
-            <div>
-              <label htmlFor="huevosPrimera" className="text-xs text-muted-foreground">Primera</label>
-              <Input id="huevosPrimera" type="number" className="mt-1" {...register("huevosPrimera", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosPrimera && <p className="text-xs text-red-600 mt-1">{errors.huevosPrimera.message as string}</p>}
-            </div>
-            <div>
-              <label htmlFor="huevosSegunda" className="text-xs text-muted-foreground">Segunda</label>
-              <Input id="huevosSegunda" type="number" className="mt-1" {...register("huevosSegunda", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosSegunda && <p className="text-xs text-red-600 mt-1">{errors.huevosSegunda.message as string}</p>}
-            </div>
-            <div>
-              <label htmlFor="huevosTercera" className="text-xs text-muted-foreground">Tercera</label>
-              <Input id="huevosTercera" type="number" className="mt-1" {...register("huevosTercera", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosTercera && <p className="text-xs text-red-600 mt-1">{errors.huevosTercera.message as string}</p>}
-            </div>
-            <div>
-              <label htmlFor="huevosSubproducto" className="text-xs text-muted-foreground">Subproducto</label>
-              <Input id="huevosSubproducto" type="number" className="mt-1" {...register("huevosSubproducto", { setValueAs: v => v === "" ? undefined : Number(v) })} />
-              {errors.huevosSubproducto && <p className="text-xs text-red-600 mt-1">{errors.huevosSubproducto.message as string}</p>}
-            </div>
+            {[
+              { id: "huevosJumbo", label: "Jumbo" },
+              { id: "huevosSuper", label: "Súper" },
+              { id: "huevosExtra", label: "Extra" },
+              { id: "huevosPrimera", label: "Primera" },
+              { id: "huevosSegunda", label: "Segunda" },
+              { id: "huevosTercera", label: "Tercera" },
+              { id: "huevosSubproducto", label: "Subproducto" },
+            ].map(({ id, label }) => (
+              <div key={id}>
+                <label htmlFor={id} className="text-xs text-muted-foreground">{label}</label>
+                <Input id={id} type="number" className="mt-1" {...register(id as any, { setValueAs: v => v === "" ? undefined : Number(v) })} />
+                {errors[id as keyof typeof errors] && <p className="text-xs text-red-600 mt-1">{String(errors[id as keyof typeof errors]?.message || "")}</p>}
+              </div>
+            ))}
           </div>
 
           <div className="mt-6">
