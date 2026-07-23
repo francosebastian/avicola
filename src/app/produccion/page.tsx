@@ -45,9 +45,10 @@ export default function ProduccionPage() {
 
   const seccionId = watch("seccionId")
   useEffect(() => {
-    if (seccionId) {
+    if (seccionId && secciones.length > 0 && lotes.length > 0) {
       const seccion = secciones.find(s => s.id === seccionId)
-      const encontrado = lotes.find(l => l.seccion === seccion?.nombre && l.galpon === seccion?.galpon?.nombre) ?? null
+      if (!seccion?.nombre) { setLoteSeleccionado(null); return }
+      const encontrado = lotes.find(l => l.seccion === seccion.nombre && l.galpon === seccion.galpon?.nombre) ?? null
       setLoteSeleccionado(encontrado)
     } else {
       setLoteSeleccionado(null)
@@ -150,7 +151,7 @@ export default function ProduccionPage() {
                 <span className="text-muted-foreground">Aves iniciales:</span>
                 <span className="font-medium">{loteSeleccionado.cantidadInicial.toLocaleString()}</span>
                 <span className="text-muted-foreground">Aves vivas:</span>
-                <span className="font-medium">{loteSeleccionado.avesVivas.toLocaleString()}</span>
+                <span className="font-medium">{(loteSeleccionado.avesVivas ?? 0).toLocaleString()}</span>
                 <span className="text-muted-foreground">Postura esperada:</span>
                 <span className="font-medium">{loteSeleccionado.postura > 0 ? `${loteSeleccionado.postura}%` : "—"}</span>
               </div>

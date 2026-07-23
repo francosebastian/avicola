@@ -26,8 +26,9 @@ export async function GET(req: NextRequest) {
       const fechaRecepcion = new Date(l.fechaRecepcion)
       const diffWeeks = Math.floor((today.getTime() - fechaRecepcion.getTime()) / (7 * 24 * 60 * 60 * 1000))
       const ultimoRegistro = l.registroDiario[0]
-      const postura = ultimoRegistro?.avesVivas
-        ? Math.round((ultimoRegistro.huevosProducidos ?? 0) / ultimoRegistro.avesVivas * 1000) / 10
+      const avesVivas = ultimoRegistro?.avesVivas ?? 0
+      const postura = avesVivas > 0
+        ? Math.round((ultimoRegistro.huevosProducidos ?? 0) / avesVivas * 1000) / 10
         : 0
 
       return {
@@ -35,6 +36,7 @@ export async function GET(req: NextRequest) {
         codigoLote: l.codigoLote,
         lineaGenetica: l.lineaGenetica,
         cantidadInicial: l.cantidadInicial,
+        avesVivas,
         estado: l.estado,
         fechaRecepcion: l.fechaRecepcion,
         edadSemanas: diffWeeks,
