@@ -30,6 +30,7 @@ function ProduccionForm() {
   const [lotes, setLotes] = useState<LoteInfo[]>([])
   const [loteSeleccionado, setLoteSeleccionado] = useState<LoteInfo | null>(null)
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [galponSel, setGalponSel] = useState("")
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm({
     resolver: zodResolver(createRegistroDiarioSchema),
@@ -52,6 +53,7 @@ function ProduccionForm() {
     const galponQr = searchParams.get("galpon")
     const seccionQr = searchParams.get("seccion")
     if (galponQr && seccionQr) {
+      setGalponSel(galponQr)
       const match = secciones.find(
         s => s.nombre === seccionQr && s.galpon?.nombre === galponQr
       )
@@ -129,7 +131,12 @@ function ProduccionForm() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="galpon" className="text-sm font-medium">Galpón</label>
-                <select id="galpon" className="w-full mt-1 rounded-md border p-2 text-sm bg-background">
+                <select
+                  id="galpon"
+                  className="w-full mt-1 rounded-md border p-2 text-sm bg-background"
+                  value={galponSel}
+                  onChange={(e) => { setGalponSel(e.target.value); setValue("seccionId", "") }}
+                >
                   <option value="">Seleccionar...</option>
                   {[...new Map(secciones.map(s => [s.galpon?.nombre, s.galpon?.nombre])).values()].filter(Boolean).map(g => (
                     <option key={g} value={g!}>{g}</option>
@@ -140,7 +147,7 @@ function ProduccionForm() {
                 <label htmlFor="seccionId" className="text-sm font-medium">Sección</label>
                 <select id="seccionId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("seccionId")}>
                   <option value="">Seleccionar...</option>
-                  {secciones.map(s => (
+                  {secciones.filter(s => !galponSel || s.galpon?.nombre === galponSel).map(s => (
                     <option key={s.id} value={s.id}>
                       {s.nombre}
                       {lotes.find(l => l.seccion === s.nombre && l.galpon === s.galpon?.nombre)
