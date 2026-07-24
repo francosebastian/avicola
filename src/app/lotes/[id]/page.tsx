@@ -216,34 +216,31 @@ export default function LoteDetailPage() {
 
       {/* QR Code - Printable */}
       {lote.galpon && lote.seccion && (
-        <Card id="qr-section" className="">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Código QR — Lote {lote.codigoLote}
-              <Button
-                variant="outline"
-                size="sm"
-                className="ml-auto print:hidden"
-                onClick={() => window.print()}
-              >
-                Imprimir QR
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4 py-6">
-            <QRCodeSVG
-              value={`${origin || "http://localhost:3000"}/produccion?galpon=${encodeURIComponent(lote.galpon)}&seccion=${encodeURIComponent(lote.seccion)}`}
-              size={200}
-              level="M"
-            />
-            <div className="text-center text-sm text-muted-foreground">
-              <p>Escanee para registrar producción diaria</p>
-              <p className="text-xs mt-1">
-                {lote.galpon} / {lote.seccion} — {lote.codigoLote}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="qr-print-wrapper">
+          <style>{`
+            @media print {
+              body > * { display: none !important; }
+              .qr-print-wrapper { display: block !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: white; z-index: 9999; }
+              .qr-print-wrapper > * { display: block !important; }
+              .qr-print-wrapper button { display: none !important; }
+            }
+          `}</style>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Código QR — Lote {lote.codigoLote}
+                <Button variant="outline" size="sm" className="ml-auto" onClick={() => window.print()}>Imprimir QR</Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center gap-4 py-6">
+              <QRCodeSVG value={`${origin || "http://localhost:3000"}/produccion?galpon=${encodeURIComponent(lote.galpon)}&seccion=${encodeURIComponent(lote.seccion)}`} size={220} level="M" />
+              <div className="text-center text-sm text-muted-foreground">
+                <p className="font-medium text-foreground">Escanee para registrar producción diaria</p>
+                <p className="text-xs mt-1">{lote.galpon} / {lote.seccion} — {lote.codigoLote}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )
