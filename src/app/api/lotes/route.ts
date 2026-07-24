@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
 
     const data = {
       ...parsed.data,
+      estado: "recepcion",
       fechaRecepcion: new Date(parsed.data.fechaRecepcion),
       fechaNacimiento: parsed.data.fechaNacimiento ? new Date(parsed.data.fechaNacimiento) : undefined,
       pesoInicialPromedio: parsed.data.pesoInicialPromedio ?? undefined,

@@ -7281,6 +7281,7 @@ export namespace Prisma {
     codigo: string | null
     capacidadMaxima: number | null
     activo: boolean | null
+    tipo: string | null
   }
 
   export type SeccionMaxAggregateOutputType = {
@@ -7290,6 +7291,7 @@ export namespace Prisma {
     codigo: string | null
     capacidadMaxima: number | null
     activo: boolean | null
+    tipo: string | null
   }
 
   export type SeccionCountAggregateOutputType = {
@@ -7299,6 +7301,7 @@ export namespace Prisma {
     codigo: number
     capacidadMaxima: number
     activo: number
+    tipo: number
     _all: number
   }
 
@@ -7318,6 +7321,7 @@ export namespace Prisma {
     codigo?: true
     capacidadMaxima?: true
     activo?: true
+    tipo?: true
   }
 
   export type SeccionMaxAggregateInputType = {
@@ -7327,6 +7331,7 @@ export namespace Prisma {
     codigo?: true
     capacidadMaxima?: true
     activo?: true
+    tipo?: true
   }
 
   export type SeccionCountAggregateInputType = {
@@ -7336,6 +7341,7 @@ export namespace Prisma {
     codigo?: true
     capacidadMaxima?: true
     activo?: true
+    tipo?: true
     _all?: true
   }
 
@@ -7432,6 +7438,7 @@ export namespace Prisma {
     codigo: string | null
     capacidadMaxima: number | null
     activo: boolean
+    tipo: string
     _count: SeccionCountAggregateOutputType | null
     _avg: SeccionAvgAggregateOutputType | null
     _sum: SeccionSumAggregateOutputType | null
@@ -7460,6 +7467,7 @@ export namespace Prisma {
     codigo?: boolean
     capacidadMaxima?: boolean
     activo?: boolean
+    tipo?: boolean
     galpon?: boolean | GalponDefaultArgs<ExtArgs>
     lotes?: boolean | Seccion$lotesArgs<ExtArgs>
     registroDiario?: boolean | Seccion$registroDiarioArgs<ExtArgs>
@@ -7477,6 +7485,7 @@ export namespace Prisma {
     codigo?: boolean
     capacidadMaxima?: boolean
     activo?: boolean
+    tipo?: boolean
     galpon?: boolean | GalponDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["seccion"]>
 
@@ -7487,6 +7496,7 @@ export namespace Prisma {
     codigo?: boolean
     capacidadMaxima?: boolean
     activo?: boolean
+    tipo?: boolean
     galpon?: boolean | GalponDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["seccion"]>
 
@@ -7497,9 +7507,10 @@ export namespace Prisma {
     codigo?: boolean
     capacidadMaxima?: boolean
     activo?: boolean
+    tipo?: boolean
   }
 
-  export type SeccionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "galponId" | "nombre" | "codigo" | "capacidadMaxima" | "activo", ExtArgs["result"]["seccion"]>
+  export type SeccionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "galponId" | "nombre" | "codigo" | "capacidadMaxima" | "activo" | "tipo", ExtArgs["result"]["seccion"]>
   export type SeccionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     galpon?: boolean | GalponDefaultArgs<ExtArgs>
     lotes?: boolean | Seccion$lotesArgs<ExtArgs>
@@ -7535,6 +7546,7 @@ export namespace Prisma {
       codigo: string | null
       capacidadMaxima: number | null
       activo: boolean
+      tipo: string
     }, ExtArgs["result"]["seccion"]>
     composites: {}
   }
@@ -7971,6 +7983,7 @@ export namespace Prisma {
     readonly codigo: FieldRef<"Seccion", 'String'>
     readonly capacidadMaxima: FieldRef<"Seccion", 'Int'>
     readonly activo: FieldRef<"Seccion", 'Boolean'>
+    readonly tipo: FieldRef<"Seccion", 'String'>
   }
     
 
@@ -53094,7 +53107,8 @@ export namespace Prisma {
     nombre: 'nombre',
     codigo: 'codigo',
     capacidadMaxima: 'capacidadMaxima',
-    activo: 'activo'
+    activo: 'activo',
+    tipo: 'tipo'
   };
 
   export type SeccionScalarFieldEnum = (typeof SeccionScalarFieldEnum)[keyof typeof SeccionScalarFieldEnum]
@@ -53993,6 +54007,7 @@ export namespace Prisma {
     codigo?: StringNullableFilter<"Seccion"> | string | null
     capacidadMaxima?: IntNullableFilter<"Seccion"> | number | null
     activo?: BoolFilter<"Seccion"> | boolean
+    tipo?: StringFilter<"Seccion"> | string
     galpon?: XOR<GalponScalarRelationFilter, GalponWhereInput>
     lotes?: LoteListRelationFilter
     registroDiario?: RegistroDiarioListRelationFilter
@@ -54009,6 +54024,7 @@ export namespace Prisma {
     codigo?: SortOrderInput | SortOrder
     capacidadMaxima?: SortOrderInput | SortOrder
     activo?: SortOrder
+    tipo?: SortOrder
     galpon?: GalponOrderByWithRelationInput
     lotes?: LoteOrderByRelationAggregateInput
     registroDiario?: RegistroDiarioOrderByRelationAggregateInput
@@ -54029,6 +54045,7 @@ export namespace Prisma {
     codigo?: StringNullableFilter<"Seccion"> | string | null
     capacidadMaxima?: IntNullableFilter<"Seccion"> | number | null
     activo?: BoolFilter<"Seccion"> | boolean
+    tipo?: StringFilter<"Seccion"> | string
     galpon?: XOR<GalponScalarRelationFilter, GalponWhereInput>
     lotes?: LoteListRelationFilter
     registroDiario?: RegistroDiarioListRelationFilter
@@ -54045,6 +54062,7 @@ export namespace Prisma {
     codigo?: SortOrderInput | SortOrder
     capacidadMaxima?: SortOrderInput | SortOrder
     activo?: SortOrder
+    tipo?: SortOrder
     _count?: SeccionCountOrderByAggregateInput
     _avg?: SeccionAvgOrderByAggregateInput
     _max?: SeccionMaxOrderByAggregateInput
@@ -54062,6 +54080,7 @@ export namespace Prisma {
     codigo?: StringNullableWithAggregatesFilter<"Seccion"> | string | null
     capacidadMaxima?: IntNullableWithAggregatesFilter<"Seccion"> | number | null
     activo?: BoolWithAggregatesFilter<"Seccion"> | boolean
+    tipo?: StringWithAggregatesFilter<"Seccion"> | string
   }
 
   export type LoteWhereInput = {
@@ -57367,6 +57386,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
@@ -57383,6 +57403,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
@@ -57397,6 +57418,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
@@ -57413,6 +57435,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
@@ -57428,6 +57451,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
   }
 
   export type SeccionUpdateManyMutationInput = {
@@ -57436,6 +57460,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
   }
 
   export type SeccionUncheckedUpdateManyInput = {
@@ -57445,6 +57470,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
   }
 
   export type LoteCreateInput = {
@@ -61262,6 +61288,7 @@ export namespace Prisma {
     codigo?: SortOrder
     capacidadMaxima?: SortOrder
     activo?: SortOrder
+    tipo?: SortOrder
   }
 
   export type SeccionAvgOrderByAggregateInput = {
@@ -61275,6 +61302,7 @@ export namespace Prisma {
     codigo?: SortOrder
     capacidadMaxima?: SortOrder
     activo?: SortOrder
+    tipo?: SortOrder
   }
 
   export type SeccionMinOrderByAggregateInput = {
@@ -61284,6 +61312,7 @@ export namespace Prisma {
     codigo?: SortOrder
     capacidadMaxima?: SortOrder
     activo?: SortOrder
+    tipo?: SortOrder
   }
 
   export type SeccionSumOrderByAggregateInput = {
@@ -66002,6 +66031,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaCreateNestedManyWithoutSeccionInput
@@ -66016,6 +66046,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
@@ -66140,6 +66171,7 @@ export namespace Prisma {
     codigo?: StringNullableFilter<"Seccion"> | string | null
     capacidadMaxima?: IntNullableFilter<"Seccion"> | number | null
     activo?: BoolFilter<"Seccion"> | boolean
+    tipo?: StringFilter<"Seccion"> | string
   }
 
   export type EquipoUpsertWithWhereUniqueWithoutGalponInput = {
@@ -66770,6 +66802,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaCreateNestedManyWithoutSeccionInput
@@ -66785,6 +66818,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
     registrosAmbientales?: RegistroAmbientalUncheckedCreateNestedManyWithoutSeccionInput
@@ -67485,6 +67519,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUpdateManyWithoutSeccionNestedInput
@@ -67500,6 +67535,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
     registrosAmbientales?: RegistroAmbientalUncheckedUpdateManyWithoutSeccionNestedInput
@@ -68279,6 +68315,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaCreateNestedManyWithoutSeccionInput
@@ -68294,6 +68331,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
     registrosAmbientales?: RegistroAmbientalUncheckedCreateNestedManyWithoutSeccionInput
@@ -68406,6 +68444,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUpdateManyWithoutSeccionNestedInput
@@ -68421,6 +68460,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
     registrosAmbientales?: RegistroAmbientalUncheckedUpdateManyWithoutSeccionNestedInput
@@ -68671,6 +68711,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
@@ -68686,6 +68727,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     registrosAmbientales?: RegistroAmbientalUncheckedCreateNestedManyWithoutSeccionInput
@@ -68798,6 +68840,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
@@ -68813,6 +68856,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     registrosAmbientales?: RegistroAmbientalUncheckedUpdateManyWithoutSeccionNestedInput
@@ -69063,6 +69107,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
@@ -69078,6 +69123,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
@@ -69190,6 +69236,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
@@ -69205,6 +69252,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
@@ -69295,6 +69343,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
@@ -69310,6 +69359,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
@@ -69422,6 +69472,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
@@ -69437,6 +69488,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
@@ -70885,6 +70937,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     galpon: GalponCreateNestedOneWithoutSeccionesInput
     lotes?: LoteCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioCreateNestedManyWithoutSeccionInput
@@ -70900,6 +70953,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
     lotes?: LoteUncheckedCreateNestedManyWithoutSeccionInput
     registroDiario?: RegistroDiarioUncheckedCreateNestedManyWithoutSeccionInput
     consumoAgua?: ConsumoAguaUncheckedCreateNestedManyWithoutSeccionInput
@@ -71012,6 +71066,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     galpon?: GalponUpdateOneRequiredWithoutSeccionesNestedInput
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
@@ -71027,6 +71082,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
@@ -72423,6 +72479,7 @@ export namespace Prisma {
     codigo?: string | null
     capacidadMaxima?: number | null
     activo?: boolean
+    tipo?: string
   }
 
   export type EquipoCreateManyGalponInput = {
@@ -72460,6 +72517,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUpdateManyWithoutSeccionNestedInput
@@ -72474,6 +72532,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
     lotes?: LoteUncheckedUpdateManyWithoutSeccionNestedInput
     registroDiario?: RegistroDiarioUncheckedUpdateManyWithoutSeccionNestedInput
     consumoAgua?: ConsumoAguaUncheckedUpdateManyWithoutSeccionNestedInput
@@ -72488,6 +72547,7 @@ export namespace Prisma {
     codigo?: NullableStringFieldUpdateOperationsInput | string | null
     capacidadMaxima?: NullableIntFieldUpdateOperationsInput | number | null
     activo?: BoolFieldUpdateOperationsInput | boolean
+    tipo?: StringFieldUpdateOperationsInput | string
   }
 
   export type EquipoUpdateWithoutGalponInput = {

@@ -146,7 +146,8 @@ exports.Prisma.SeccionScalarFieldEnum = {
   nombre: 'nombre',
   codigo: 'codigo',
   capacidadMaxima: 'capacidadMaxima',
-  activo: 'activo'
+  activo: 'activo',
+  tipo: 'tipo'
 };
 
 exports.Prisma.LoteScalarFieldEnum = {

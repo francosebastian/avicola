@@ -46,6 +46,7 @@ model Seccion {
   codigo          String? @map("codigo")
   capacidadMaxima Int?    @map("capacidad_maxima")
   activo          Boolean @default(true) @map("activo")
+  tipo            String  @default("produccion") @map("tipo") // produccion, recepcion
 
   lotes                Lote[]
   registroDiario       RegistroDiario[]
@@ -72,7 +73,7 @@ model Lote {
   fechaNacimiento      DateTime? @map("fecha_nacimiento") @db.Date
   pesoInicialPromedio  Decimal?  @map("peso_inicial_promedio") @db.Decimal(5, 2)
   costoPollitaUnitario Decimal?  @map("costo_pollita_unitario") @db.Decimal(10, 2)
-  estado               String    @default("activo") @map("estado") // cria, recria, postura, descarte, cerrado
+  estado               String    @default("recepcion") @map("estado") // recepcion, cria, recria, postura, descarte, cerrado
   fechaCierre          DateTime? @map("fecha_cierre") @db.Date
   motivoCierre         String?   @map("motivo_cierre")
   createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz()

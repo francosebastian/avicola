@@ -138,7 +138,12 @@ export default function LotesPage() {
                   </td>
                   <td className="p-3">
                     <Badge
-                      variant={l.estado === "postura" ? "default" : "secondary"}
+                      variant={
+                        l.estado === "postura" ? "default" :
+                        l.estado === "recepcion" || l.estado === "cria" ? "secondary" :
+                        l.estado === "recria" ? "outline" :
+                        l.estado === "descarte" ? "destructive" : "secondary"
+                      }
                     >
                       {l.estado}
                     </Badge>

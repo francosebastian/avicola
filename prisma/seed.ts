@@ -28,6 +28,7 @@ async function main() {
   const g1c = await prisma.seccion.create({ data: { galponId: g1.id, nombre: "Fila C", codigo: "G1-FC", capacidadMaxima: 5000 } })
   const g2n = await prisma.seccion.create({ data: { galponId: g2.id, nombre: "Ala Norte", codigo: "G2-AN", capacidadMaxima: 5000 } })
   const g2s = await prisma.seccion.create({ data: { galponId: g2.id, nombre: "Ala Sur", codigo: "G2-AS", capacidadMaxima: 5000 } })
+  const recepcionSec = await prisma.seccion.create({ data: { galponId: g1.id, nombre: "Recepción", codigo: "G1-REC", capacidadMaxima: 5000, tipo: "recepcion" } })
 
   for (let sem = 18; sem <= 90; sem++) {
     const pico = sem >= 24 && sem <= 32 ? 95 : sem >= 18 && sem < 24 ? 5 + (sem - 18) * 15 : Math.max(70, 95 - (sem - 32) * 0.4)

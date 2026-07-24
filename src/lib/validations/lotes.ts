@@ -17,11 +17,11 @@ export const updateLoteSchema = z.object({
   seccionId: z.string().uuid().optional(),
   lineaGenetica: z.string().min(1).optional(),
   cantidadInicial: z.number().int().positive().optional(),
-  estado: z.enum(["cria", "recria", "postura", "descarte", "cerrado"]).optional(),
+  estado: z.enum(["recepcion", "cria", "recria", "postura", "descarte", "cerrado"]).optional(),
 })
 
 export const changeEstadoSchema = z.object({
-  estado: z.enum(["cria", "recria", "postura", "descarte", "cerrado"]),
+  estado: z.enum(["recepcion", "cria", "recria", "postura", "descarte", "cerrado"]),
 })
 
 export const listLotesSchema = z.object({
