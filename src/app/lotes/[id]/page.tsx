@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "sonner"
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
@@ -109,15 +110,17 @@ export default function LoteDetailPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Link href={`/produccion?loteId=${lote.id}`}>
-            <Button variant="outline">Registro Diario</Button>
-          </Link>
-          <Link href={`/lotes/${lote.id}/eventos`}>
-            <Button variant="outline">Eventos</Button>
-          </Link>
-          <Link href={`/finanzas?loteId=${lote.id}`}>
-            <Button>Resumen Económico</Button>
-          </Link>
+          <Link href={`/produccion?loteId=${lote.id}`}><Button variant="outline">Registro Diario</Button></Link>
+          {lote.estado !== "descarte" && lote.estado !== "cerrado" && (
+            <Button variant="outline" onClick={async () => {
+              const res = await fetch(`/api/lotes/${lote.id}/avanzar-fase`, { method: "POST" })
+              const data = await res.json()
+              if (!res.ok) { toast.error(data.error || "Error"); return }
+              toast.success(data.message)
+              window.location.reload()
+            }}>Avanzar Fase</Button>
+          )}
+          <Link href={`/finanzas?loteId=${lote.id}`}><Button>Resumen Económico</Button></Link>
         </div>
       </div>
 
