@@ -38,10 +38,20 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
-    const data = await prisma.registroDiario.create({ data: parsed.data as any })
-    return NextResponse.json(data, { status: 201 })
-  } catch (error) {
-    return NextResponse.json({ error: "Error interno" }, { status: 500 })
+
+    const data = {
+      ...parsed.data,
+      fecha: parsed.data.fecha ? new Date(parsed.data.fecha) : new Date(),
+      loteId: parsed.data.loteId ?? "",
+      consumoAlimentoKg: parsed.data.consumoAlimentoKg ?? 0,
+      consumoAguaLitros: parsed.data.consumoAguaLitros ?? 0,
+    }
+
+    const registro = await prisma.registroDiario.create({ data: data as any })
+    return NextResponse.json(registro, { status: 201 })
+  } catch (error: any) {
+    console.error("[REGISTRO_DIARIO] error:", error?.message || error)
+    return NextResponse.json({ error: "Error al guardar. Verifique que no exista un registro para esta sección y fecha." }, { status: 500 })
   }
 }
 
