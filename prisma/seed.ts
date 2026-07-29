@@ -72,7 +72,15 @@ async function main() {
   const minimos = [2000, 1500, 800, 100, 1000, 500, 100]
   for (let i = 0; i < insumos.length; i++) await prisma.stockInsumo.create({ data: { tipoInsumo: insumos[i], stockActualKg: stocks[i], stockMinimoKg: minimos[i] } })
 
-  const formatos = [{ categoria: "jumbo", unidadesPorCaja: 180 }, { categoria: "super", unidadesPorCaja: 100 }, { categoria: "extra", unidadesPorCaja: 180 }, { categoria: "primera", unidadesPorCaja: 180 }, { categoria: "segunda", unidadesPorCaja: 180 }, { categoria: "tercera", unidadesPorCaja: 180 }]
+  const formatos = [
+    { categoria: "jumbo_xxl", unidadesPorCaja: 100 },
+    { categoria: "jumbo", unidadesPorCaja: 100 },
+    { categoria: "super", unidadesPorCaja: 100 },
+    { categoria: "extra", unidadesPorCaja: 180 },
+    { categoria: "primera", unidadesPorCaja: 180 },
+    { categoria: "segunda", unidadesPorCaja: 180 },
+    { categoria: "tercera", unidadesPorCaja: 180 },
+  ]
   for (const f of formatos) { await prisma.formatoCaja.create({ data: f }); await prisma.inventarioPacking.create({ data: { categoria: f.categoria, stockCajas: 0, stockUnidades: 0 } }) }
 
   const alertas = [{ tipo: "caida_postura", umbralMin: 5, umbralMax: null, canales: ["in_app", "email"] }, { tipo: "mortalidad_diaria", umbralMin: 0.1, umbralMax: null, canales: ["in_app", "email"] }, { tipo: "consumo_alimento", umbralMin: 15, umbralMax: 15, canales: ["in_app"] }, { tipo: "consumo_agua", umbralMin: 20, umbralMax: null, canales: ["in_app", "email", "whatsapp"] }, { tipo: "temperatura", umbralMin: 16, umbralMax: 28, canales: ["in_app", "whatsapp"] }, { tipo: "amoniaco", umbralMin: null, umbralMax: 15, canales: ["in_app"] }, { tipo: "stock_alimento", umbralMin: null, umbralMax: null, canales: ["in_app"] }]
