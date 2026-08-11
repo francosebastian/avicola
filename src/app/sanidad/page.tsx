@@ -78,9 +78,7 @@ export default function SanidadPage() {
         </div>
         <div className="flex gap-2">
           <Dialog open={vacDialogOpen} onOpenChange={setVacDialogOpen}>
-            <DialogTrigger>
-              <Button variant="outline" type="button">Registrar Vacunación</Button>
-            </DialogTrigger>
+            <DialogTrigger render={<Button variant="outline" type="button">Registrar Vacunación</Button>} />
             <DialogContent className="max-w-lg">
               <DialogHeader><DialogTitle>Registrar Vacunación</DialogTitle></DialogHeader>
               <form onSubmit={vacForm.handleSubmit(onVacSubmit)} className="space-y-4">
@@ -149,9 +147,7 @@ export default function SanidadPage() {
           </Dialog>
 
           <Dialog open={traDialogOpen} onOpenChange={setTraDialogOpen}>
-            <DialogTrigger>
-              <Button variant="outline" type="button">Registrar Tratamiento</Button>
-            </DialogTrigger>
+            <DialogTrigger render={<Button variant="outline" type="button">Registrar Tratamiento</Button>} />
             <DialogContent className="max-w-lg">
               <DialogHeader><DialogTitle>Registrar Tratamiento</DialogTitle></DialogHeader>
               <form onSubmit={traForm.handleSubmit(onTraSubmit)} className="space-y-4">

@@ -104,9 +104,7 @@ export default function BioseguridadPage() {
           <p className="text-muted-foreground text-sm">Control de visitas y checklist diario de bioseguridad</p>
         </div>
         <Dialog open={visitaOpen} onOpenChange={setVisitaOpen}>
-          <DialogTrigger>
-            <Button type="button">Registrar Visita</Button>
-          </DialogTrigger>
+          <DialogTrigger render={<Button type="button">Registrar Visita</Button>} />
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>Registrar Visita</DialogTitle></DialogHeader>
             <form onSubmit={visitaForm.handleSubmit(onVisitaSubmit)} className="space-y-4">
