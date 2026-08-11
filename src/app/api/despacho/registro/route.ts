@@ -42,18 +42,46 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
-    const { detalle, ...despachoData } = parsed.data as any
-    const data = await prisma.despacho.create({
-      data: {
-        ...despachoData,
-        detalle: {
-          create: detalle,
+    const { detalle, ...despachoData } = parsed.data
+
+    const data = await prisma.$transaction(async (tx) => {
+      const detalleConUds = await Promise.all(detalle.map(async (item) => {
+        const fmt = await tx.formatoCaja.findUnique({ where: { categoria: item.categoria } })
+        const uds = fmt?.unidadesPorCaja ?? 100
+        return { ...item, cantidadUnidades: item.cantidadCajas * uds }
+      }))
+
+      const despacho = await tx.despacho.create({
+        data: {
+          ...despachoData,
+          detalle: { create: detalleConUds },
         },
-      },
-      include: { detalle: true },
+        include: { detalle: true },
+      })
+
+      for (const item of detalle) {
+        const inv = await tx.inventarioPacking.findUnique({ where: { categoria: item.categoria } })
+        if (!inv || inv.stockCajas < item.cantidadCajas) {
+          throw new Error(`Stock insuficiente para ${item.categoria}`)
+        }
+        const fmt = await tx.formatoCaja.findUnique({ where: { categoria: item.categoria } })
+        const uds = fmt?.unidadesPorCaja ?? 100
+        await tx.inventarioPacking.update({
+          where: { categoria: item.categoria },
+          data: {
+            stockCajas: { decrement: item.cantidadCajas },
+            stockUnidades: { decrement: item.cantidadCajas * uds },
+          },
+        })
+      }
+
+      return despacho
     })
+
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: "Error interno" }, { status: 500 })
+    const msg = error instanceof Error ? error.message : "Error interno"
+    const status = msg.startsWith("Stock insuficiente") ? 400 : 500
+    return NextResponse.json({ error: msg }, { status })
   }
 }

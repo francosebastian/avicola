@@ -313,8 +313,7 @@ exports.Prisma.FabricacionAlimentoScalarFieldEnum = {
   fecha: 'fecha',
   formulaId: 'formulaId',
   cantidadProducidaKg: 'cantidadProducidaKg',
-  destinoGalponId: 'destinoGalponId',
-  destinoSeccionId: 'destinoSeccionId',
+  destino: 'destino',
   loteFabricacion: 'loteFabricacion',
   createdAt: 'createdAt'
 };
@@ -451,9 +450,10 @@ exports.Prisma.RegistroPackingScalarFieldEnum = {
   fecha: 'fecha',
   loteId: 'loteId',
   seccionId: 'seccionId',
-  huevosSucio: 'huevosSucio',
-  huevosRoto: 'huevosRoto',
-  huevosDescarte: 'huevosDescarte',
+  huevosRotosKg: 'huevosRotosKg',
+  cajasDescarteX: 'cajasDescarteX',
+  cajasTrizados: 'cajasTrizados',
+  cajasJumboXxl: 'cajasJumboXxl',
   cajasJumbo: 'cajasJumbo',
   cajasSuper: 'cajasSuper',
   cajasExtra: 'cajasExtra',

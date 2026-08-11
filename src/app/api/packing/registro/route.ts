@@ -7,8 +7,8 @@ const createSchema = z.object({
   seccionId: z.string().uuid(),
   fecha: z.string().optional(),
   huevosRotosKg: z.number().nonnegative().default(0).optional(),
-  descarteXUnidades: z.number().int().nonnegative().default(0).optional(),
-  trizadosUnidades: z.number().int().nonnegative().default(0).optional(),
+  cajasDescarteX: z.number().int().nonnegative().default(0).optional(),
+  cajasTrizados: z.number().int().nonnegative().default(0).optional(),
   cajasJumboXxl: z.number().int().nonnegative().default(0).optional(),
   cajasJumbo: z.number().int().nonnegative().default(0).optional(),
   cajasSuper: z.number().int().nonnegative().default(0).optional(),
@@ -58,6 +58,8 @@ export async function POST(req: NextRequest) {
 
     // Update inventario packing
     const cats = [
+      { key: "cajasDescarteX", cat: "descarte_x" },
+      { key: "cajasTrizados", cat: "trizados" },
       { key: "cajasJumboXxl", cat: "jumbo_xxl" },
       { key: "cajasJumbo", cat: "jumbo" },
       { key: "cajasSuper", cat: "super" },

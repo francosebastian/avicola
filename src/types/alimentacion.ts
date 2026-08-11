@@ -50,8 +50,7 @@ export interface FabricacionAlimento {
   fecha: Date | string
   formulaId: string
   cantidadProducidaKg: number
-  destinoGalponId: string | null
-  destinoSeccionId: string | null
+  destino: string | null
   loteFabricacion: string
   createdAt: Date | string
   detalle: DetalleFabricacion[]
@@ -68,8 +67,7 @@ export interface CreateFabricacionInput {
   fecha: Date | string
   formulaId: string
   cantidadProducidaKg: number
-  destinoGalponId?: string | null
-  destinoSeccionId?: string | null
+  destino?: string | null
   loteFabricacion: string
   detalle: Omit<DetalleFabricacion, 'id' | 'fabricacionId'>[]
 }

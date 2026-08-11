@@ -13,13 +13,15 @@ import Link from "next/link"
 import { z } from "zod"
 
 const categorias = [
-  { id: "cajasJumboXxl", label: "Jumbo XXL", peso: "> 78 g", uds: 100 },
-  { id: "cajasJumbo", label: "Jumbo", peso: "74 – 78 g", uds: 100 },
-  { id: "cajasSuper", label: "Súper", peso: "68 – 73 g", uds: 100 },
-  { id: "cajasExtra", label: "Extra", peso: "61 – 67 g", uds: 180 },
-  { id: "cajasPrimera", label: "Primera", peso: "54 – 60 g", uds: 180 },
-  { id: "cajasSegunda", label: "Segunda", peso: "45 – 53 g", uds: 180 },
-  { id: "cajasTercera", label: "Tercera", peso: "< 44 g", uds: 180 },
+  { id: "cajasJumboXxl", label: "Jumbo XXL", peso: "> 78 g", uds: 100, stockKey: "jumbo_xxl" },
+  { id: "cajasJumbo", label: "Jumbo", peso: "74 – 78 g", uds: 100, stockKey: "jumbo" },
+  { id: "cajasSuper", label: "Súper", peso: "68 – 73 g", uds: 100, stockKey: "super" },
+  { id: "cajasExtra", label: "Extra", peso: "61 – 67 g", uds: 180, stockKey: "extra" },
+  { id: "cajasPrimera", label: "Primera", peso: "54 – 60 g", uds: 180, stockKey: "primera" },
+  { id: "cajasSegunda", label: "Segunda", peso: "45 – 53 g", uds: 180, stockKey: "segunda" },
+  { id: "cajasTercera", label: "Tercera", peso: "< 44 g", uds: 180, stockKey: "tercera" },
+  { id: "cajasDescarteX", label: "Descarte X", peso: "defectos estéticos", uds: 100, stockKey: "descarte_x" },
+  { id: "cajasTrizados", label: "Trizados", peso: "huevos trizados", uds: 100, stockKey: "trizados" },
 ]
 
 const schema = z.object({
@@ -27,8 +29,8 @@ const schema = z.object({
   seccionId: z.string().uuid(),
   fecha: z.string().optional(),
   huevosRotosKg: z.number().nonnegative().default(0).optional(),
-  descarteXUnidades: z.number().int().nonnegative().default(0).optional(),
-  trizadosUnidades: z.number().int().nonnegative().default(0).optional(),
+  cajasDescarteX: z.number().int().nonnegative().default(0).optional(),
+  cajasTrizados: z.number().int().nonnegative().default(0).optional(),
   cajasJumboXxl: z.number().int().nonnegative().default(0).optional(),
   cajasJumbo: z.number().int().nonnegative().default(0).optional(),
   cajasSuper: z.number().int().nonnegative().default(0).optional(),
@@ -46,10 +48,11 @@ export default function PackingPage() {
   const [lotes, setLotes] = useState<any[]>([])
   const [showConfirm, setShowConfirm] = useState(false)
   const [confirmData, setConfirmData] = useState<Record<string, any>>({})
+  const [inventario, setInventario] = useState<any[]>([])
 
   const { register, handleSubmit, watch, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { huevosRotosKg: 0, descarteXUnidades: 0, trizadosUnidades: 0 },
+    defaultValues: { huevosRotosKg: 0, cajasDescarteX: 0, cajasTrizados: 0 },
   })
 
   useEffect(() => {
@@ -62,6 +65,14 @@ export default function PackingPage() {
     }).catch(() => toast.error("Error al cargar datos"))
   }, [])
 
+  useEffect(() => {
+    if (tab !== "inventario") return
+    fetch("/api/packing/inventario?limit=100")
+      .then(r => r.json())
+      .then(json => setInventario(json.data || []))
+      .catch(() => toast.error("Error al cargar inventario"))
+  }, [tab])
+
   const vals = watch()
 
   const totalCajas = categorias.reduce((s, c) => s + (Number((vals as any)[c.id]) || 0), 0)
@@ -70,8 +81,9 @@ export default function PackingPage() {
   function onPreSubmit(data: FormData) {
     const body: Record<string, any> = { ...data }
     for (const k of Object.keys(body)) {
+      if (k === "loteId" || k === "seccionId" || k === "fecha") continue
       if (typeof body[k] === "string" && body[k] !== "") body[k] = Number(body[k])
-      if (body[k] === "" || body[k] === undefined) body[k] = 0
+      if (body[k] === "" || body[k] === undefined || Number.isNaN(body[k])) body[k] = 0
     }
     body.fecha = new Date().toISOString().split("T")[0]
     setConfirmData(body)
@@ -144,21 +156,11 @@ export default function PackingPage() {
 
             <Card>
               <CardHeader><CardTitle>No Clasificados</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent>
                 <div>
                   <label className="text-sm font-medium">Huevos Rotos (kg)</label>
                   <p className="text-xs text-muted-foreground mb-1">Huevos que van a la fosa — se pesan en kg</p>
                   <Input type="number" step="0.1" className="mt-1" {...register("huevosRotosKg", { setValueAs: (v: any) => v === "" ? 0 : Number(v) })} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Descarte X (unidades)</label>
-                  <p className="text-xs text-muted-foreground mb-1">Huevos con defectos estéticos que se envasan</p>
-                  <Input type="number" className="mt-1" {...register("descarteXUnidades", { setValueAs: (v: any) => v === "" ? 0 : Number(v) })} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Trizados (unidades)</label>
-                  <p className="text-xs text-muted-foreground mb-1">Huevos trizados — descarte</p>
-                  <Input type="number" className="mt-1" {...register("trizadosUnidades", { setValueAs: (v: any) => v === "" ? 0 : Number(v) })} />
                 </div>
               </CardContent>
             </Card>
@@ -228,19 +230,19 @@ export default function PackingPage() {
                 </tr>
               </thead>
               <tbody>
-                {categorias.map((cat) => (
-                  <tr key={cat.id} className="border-b last:border-0 hover:bg-muted/50">
-                    <td className="p-3 font-medium">{cat.label}</td>
-                    <td className="p-3" id={`stock-${cat.id}`}>...</td>
-                    <td className="p-3" id={`stock-uds-${cat.id}`}>...</td>
-                    <td className="p-3 text-sm text-muted-foreground">{cat.uds} uds/caja</td>
-                  </tr>
-                ))}
+                {categorias.map((cat) => {
+                  const stock = inventario.find((i: any) => i.categoria === cat.stockKey)
+                  return (
+                    <tr key={cat.id} className="border-b last:border-0 hover:bg-muted/50">
+                      <td className="p-3 font-medium">{cat.label}</td>
+                      <td className="p-3">{Number(stock?.stockCajas ?? 0).toLocaleString()}</td>
+                      <td className="p-3">{Number(stock?.stockUnidades ?? 0).toLocaleString()}</td>
+                      <td className="p-3 text-sm text-muted-foreground">{cat.uds} uds/caja</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
-            <div className="p-4 text-xs text-muted-foreground bg-muted">
-              Los datos de inventario se cargan desde el endpoint. (Próximamente tabla dinámica)
-            </div>
           </CardContent>
         </Card>
       )}
@@ -253,8 +255,6 @@ export default function PackingPage() {
               ["Lote", lotes.find((l: any) => l.id === confirmData.loteId)?.codigoLote],
               ["Sección", secciones.find((s: any) => s.id === confirmData.seccionId)?.nombre],
               ["Huevos Rotos (kg)", confirmData.huevosRotosKg],
-              ["Descarte X (uds)", confirmData.descarteXUnidades],
-              ["Trizados (uds)", confirmData.trizadosUnidades],
               ...categorias.map(c => [`${c.label} (cajas)`, confirmData[c.id]]),
               ["Total Cajas", totalCajas],
               ["Total Unidades", totalUnidades],

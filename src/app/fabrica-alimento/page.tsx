@@ -10,27 +10,102 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createRecepcionInsumoSchema, createFabricacionAlimentoSchema } from "@/lib/validations/alimentacion"
+import { z } from "zod"
+
+type RecepcionForm = z.infer<typeof createRecepcionInsumoSchema>
+type FabricacionForm = z.infer<typeof createFabricacionAlimentoSchema>
+
+const INSUMOS = [
+  "Maíz", "Soya", "Conchuela", "Nutrameal", "Harinilla", "Núcleo Ponedora", "Núcleo Pollita",
+  "Fosfato Bicálcico", "Sal", "Lisina", "Metionina", "Monsigran", "Biomin", "Mycofix",
+]
+
+const DESTINOS = [
+  {
+    id: "galpon-1",
+    nombre: "Galpón 1",
+    silos: [
+      { id: "silo-1", nombre: "Silo 1 (A)" },
+      { id: "silo-2", nombre: "Silo 2 (B)" },
+    ],
+  },
+  {
+    id: "galpon-2",
+    nombre: "Galpón 2",
+    silos: [
+      { id: "silo-1", nombre: "Silo 1 (A)" },
+      { id: "silo-2", nombre: "Silo 2 (B)" },
+    ],
+  },
+  {
+    id: "recria",
+    nombre: "Recría",
+    silos: [
+      { id: "silo-1", nombre: "Silo 1 (A)" },
+      { id: "silo-2", nombre: "Silo 2 (B)" },
+    ],
+  },
+]
 
 type StockItem = { tipo: string; stock: number; minimo: number; unidad: string }
+type RecepcionRow = { id: string; fechaLlegada: string; proveedor: string; tipoInsumo: string; cantidadKg: number; numeroLote: string; numeroGuia: string; vehiculo: string | null }
+type FabricacionRow = { id: string; fecha: string; formulaId: string; cantidadProducidaKg: number; loteFabricacion: string; destino: string | null }
 
 export default function FabricaAlimentoPage() {
   const router = useRouter()
   const [tab, setTab] = useState<"recepcion" | "stock" | "fabricacion">("recepcion")
   const [stock, setStock] = useState<StockItem[]>([])
+  const [formulas, setFormulas] = useState<{ id: string; nombre: string }[]>([])
+  const [recepciones, setRecepciones] = useState<RecepcionRow[]>([])
+  const [fabricaciones, setFabricaciones] = useState<FabricacionRow[]>([])
+  const [destinoId, setDestinoId] = useState("")
+  const [siloId, setSiloId] = useState("")
 
   const recepcionForm = useForm({ resolver: zodResolver(createRecepcionInsumoSchema) })
   const fabricacionForm = useForm({ resolver: zodResolver(createFabricacionAlimentoSchema) })
 
+  const destinoSel = DESTINOS.find(d => d.id === destinoId)
+
   useEffect(() => {
-    if (tab === "stock") {
-      fetch("/api/fabrica/stock")
+    fetch("/api/alimentacion/formulas?limit=100")
+      .then(r => r.json())
+      .then(j => setFormulas((j.data || []).filter((f: { activo?: boolean }) => f.activo)))
+      .catch(() => toast.error("Error al cargar fórmulas"))
+  }, [])
+
+  useEffect(() => {
+    if (tab === "recepcion") {
+      let cancelled = false
+      fetch("/api/fabrica/recepcion?limit=100")
         .then(r => r.json())
-        .then(data => setStock(data.data || data || []))
+        .then(j => { if (!cancelled) setRecepciones((j.data || []) as RecepcionRow[]) })
+        .catch(() => toast.error("Error al cargar recepciones"))
+      return () => { cancelled = true }
+    }
+    if (tab === "stock") {
+      let cancelled = false
+      fetch("/api/fabrica/stock?limit=100")
+        .then(r => r.json())
+        .then(j => {
+          if (!cancelled) {
+            const rows = (j.data || j || []) as Array<{ tipoInsumo: string; stockActualKg: number; stockMinimoKg: number }>
+            setStock(rows.map(r => ({ tipo: r.tipoInsumo, stock: Number(r.stockActualKg) || 0, minimo: Number(r.stockMinimoKg) || 0, unidad: "kg" })))
+          }
+        })
         .catch(() => toast.error("Error al cargar stock"))
+      return () => { cancelled = true }
+    }
+    if (tab === "fabricacion") {
+      let cancelled = false
+      fetch("/api/fabrica/fabricacion?limit=100")
+        .then(r => r.json())
+        .then(j => { if (!cancelled) setFabricaciones((j.data || []) as FabricacionRow[]) })
+        .catch(() => toast.error("Error al cargar fabricaciones"))
+      return () => { cancelled = true }
     }
   }, [tab])
 
-  async function onSubmitRecepcion(data: any) {
+  async function onSubmitRecepcion(data: RecepcionForm) {
     const body = { ...data, cantidadKg: Number(data.cantidadKg) }
 
     const res = await fetch("/api/fabrica/recepcion", {
@@ -48,10 +123,28 @@ export default function FabricaAlimentoPage() {
     toast.success("Recepción registrada correctamente")
     recepcionForm.reset()
     router.refresh()
+    try {
+      const j = await (await fetch("/api/fabrica/recepcion?limit=100")).json()
+      setRecepciones((j.data || []) as RecepcionRow[])
+    } catch { /* noop */ }
   }
 
-  async function onSubmitFabricacion(data: any) {
-    const body = { ...data, cantidadProducidaKg: Number(data.cantidadProducidaKg) }
+  async function onSubmitFabricacion(data: FabricacionForm) {
+    if (!destinoSel || !siloId) {
+      toast.error("Seleccione el destino y el silo")
+      return
+    }
+    const siloSel = destinoSel.silos.find(s => s.id === siloId)
+    if (!siloSel) {
+      toast.error("Seleccione el silo")
+      return
+    }
+
+    const body = {
+      ...data,
+      cantidadProducidaKg: Number(data.cantidadProducidaKg),
+      destino: `${destinoSel.nombre} -> ${siloSel.nombre}`,
+    }
 
     const res = await fetch("/api/fabrica/fabricacion", {
       method: "POST",
@@ -67,7 +160,18 @@ export default function FabricaAlimentoPage() {
 
     toast.success("Fabricación registrada correctamente")
     fabricacionForm.reset()
+    setDestinoId("")
+    setSiloId("")
     router.refresh()
+    try {
+      const j = await (await fetch("/api/fabrica/fabricacion?limit=100")).json()
+      setFabricaciones((j.data || []) as FabricacionRow[])
+    } catch { /* noop */ }
+  }
+
+  function fmtFecha(f: string) {
+    const d = new Date(f)
+    return isNaN(d.getTime()) ? f : d.toLocaleDateString("es-CL", { day: "2-digit", month: "short", year: "numeric" })
   }
 
   return (
@@ -111,13 +215,7 @@ export default function FabricaAlimentoPage() {
                   <label htmlFor="tipoInsumo" className="text-sm font-medium">Tipo de Insumo</label>
                   <select id="tipoInsumo" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...recepcionForm.register("tipoInsumo")}>
                     <option value="">Seleccionar...</option>
-                    <option value="Maíz">Maíz</option>
-                    <option value="Soya">Soya</option>
-                    <option value="Conchuela">Conchuela</option>
-                    <option value="Vitaminas">Vitaminas</option>
-                    <option value="Harinilla">Harinilla</option>
-                    <option value="Calcio">Calcio</option>
-                    <option value="Minerales">Minerales</option>
+                    {INSUMOS.map(i => <option key={i} value={i}>{i}</option>)}
                   </select>
                   {recepcionForm.formState.errors.tipoInsumo && <p className="text-sm text-red-600 mt-1">{recepcionForm.formState.errors.tipoInsumo.message as string}</p>}
                 </div>
@@ -156,22 +254,20 @@ export default function FabricaAlimentoPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { fecha: "20 Jul 2026", prov: "NutriAVES S.A.", insumo: "Maíz", kg: 15000, lote: "L-2026-07-20-001", guia: "GD-4581-2026", veh: "ABC-123" },
-                    { fecha: "19 Jul 2026", prov: "AgroSoya Ltda.", insumo: "Soya", kg: 10000, lote: "L-2026-07-19-002", guia: "GD-4572-2026", veh: "DEF-456" },
-                    { fecha: "18 Jul 2026", prov: "Minerales del Sur", insumo: "Conchuela", kg: 5000, lote: "L-2026-07-18-003", guia: "GD-4560-2026", veh: "GHI-789" },
-                    { fecha: "16 Jul 2026", prov: "Vitafeed S.A.", insumo: "Vitaminas", kg: 500, lote: "L-2026-07-16-004", guia: "GD-4540-2026", veh: "JKL-012" },
-                  ].map((r, i) => (
-                    <tr key={i} className="border-b last:border-0 hover:bg-muted/50">
-                      <td className="p-3 text-sm">{r.fecha}</td>
-                      <td className="p-3 text-sm">{r.prov}</td>
-                      <td className="p-3"><Badge variant="secondary">{r.insumo}</Badge></td>
-                      <td className="p-3">{r.kg.toLocaleString()}</td>
-                      <td className="p-3 font-mono text-xs">{r.lote}</td>
-                      <td className="p-3 font-mono text-xs">{r.guia}</td>
-                      <td className="p-3 text-sm">{r.veh}</td>
+                  {recepciones.map(r => (
+                    <tr key={r.id} className="border-b last:border-0 hover:bg-muted/50">
+                      <td className="p-3 text-sm">{fmtFecha(r.fechaLlegada)}</td>
+                      <td className="p-3 text-sm">{r.proveedor}</td>
+                      <td className="p-3"><Badge variant="secondary">{r.tipoInsumo}</Badge></td>
+                      <td className="p-3">{Number(r.cantidadKg).toLocaleString()}</td>
+                      <td className="p-3 font-mono text-xs">{r.numeroLote}</td>
+                      <td className="p-3 font-mono text-xs">{r.numeroGuia}</td>
+                      <td className="p-3 text-sm">{r.vehiculo || "—"}</td>
                     </tr>
                   ))}
+                  {recepciones.length === 0 && (
+                    <tr><td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">Sin recepciones registradas</td></tr>
+                  )}
                 </tbody>
               </table>
             </CardContent>
@@ -236,9 +332,7 @@ export default function FabricaAlimentoPage() {
                   <label htmlFor="formulaId" className="text-sm font-medium">Fórmula</label>
                   <select id="formulaId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...fabricacionForm.register("formulaId")}>
                     <option value="">Seleccionar...</option>
-                    <option value="1">Postura Fase 1 — Hy-Line Brown</option>
-                    <option value="2">Postura Fase 2 — Hy-Line Brown</option>
-                    <option value="3">Recría — Lohmann LSL</option>
+                    {formulas.map(f => <option key={f.id} value={f.id}>{f.nombre}</option>)}
                   </select>
                   {fabricacionForm.formState.errors.formulaId && <p className="text-sm text-red-600 mt-1">{fabricacionForm.formState.errors.formulaId.message as string}</p>}
                 </div>
@@ -258,20 +352,28 @@ export default function FabricaAlimentoPage() {
                   {fabricacionForm.formState.errors.fecha && <p className="text-sm text-red-600 mt-1">{fabricacionForm.formState.errors.fecha.message as string}</p>}
                 </div>
                 <div>
-                  <label htmlFor="destinoGalponId" className="text-sm font-medium">Destino (Galpón)</label>
-                  <select id="destinoGalponId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...fabricacionForm.register("destinoGalponId")}>
+                  <label htmlFor="destinoId" className="text-sm font-medium">Destino</label>
+                  <select
+                    id="destinoId"
+                    className="w-full mt-1 rounded-md border p-2 text-sm bg-background"
+                    value={destinoId}
+                    onChange={(e) => { setDestinoId(e.target.value); setSiloId("") }}
+                  >
                     <option value="">Seleccionar...</option>
-                    <option value="1">Galpón 1</option>
-                    <option value="2">Galpón 2</option>
+                    {DESTINOS.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="destinoSeccionId" className="text-sm font-medium">Destino (Sección)</label>
-                  <select id="destinoSeccionId" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...fabricacionForm.register("destinoSeccionId")}>
+                  <label htmlFor="siloId" className="text-sm font-medium">Silo</label>
+                  <select
+                    id="siloId"
+                    className="w-full mt-1 rounded-md border p-2 text-sm bg-background"
+                    value={siloId}
+                    onChange={(e) => setSiloId(e.target.value)}
+                    disabled={!destinoSel}
+                  >
                     <option value="">Seleccionar...</option>
-                    <option value="1">Fila A</option>
-                    <option value="2">Fila B</option>
-                    <option value="3">Fila C</option>
+                    {(destinoSel?.silos || []).map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
                   </select>
                 </div>
                 <div className="flex items-end">
@@ -294,20 +396,18 @@ export default function FabricaAlimentoPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { fecha: "20 Jul 2026", lote: "FAB-2026-07-20-001", formula: "Postura Fase 1", kg: 20000, destino: "Galpón 1 — Fila A" },
-                    { fecha: "19 Jul 2026", lote: "FAB-2026-07-19-002", formula: "Postura Fase 1", kg: 15000, destino: "Galpón 1 — Fila B" },
-                    { fecha: "19 Jul 2026", lote: "FAB-2026-07-19-003", formula: "Recría", kg: 8000, destino: "Galpón 2 — Ala Norte" },
-                    { fecha: "18 Jul 2026", lote: "FAB-2026-07-18-004", formula: "Postura Fase 2", kg: 20000, destino: "Galpón 2 — Ala Sur" },
-                  ].map((f, i) => (
-                    <tr key={i} className="border-b last:border-0 hover:bg-muted/50">
-                      <td className="p-3 text-sm">{f.fecha}</td>
-                      <td className="p-3 font-mono text-xs">{f.lote}</td>
-                      <td className="p-3">{f.formula}</td>
-                      <td className="p-3">{f.kg.toLocaleString()}</td>
-                      <td className="p-3 text-sm">{f.destino}</td>
+                  {fabricaciones.map(f => (
+                    <tr key={f.id} className="border-b last:border-0 hover:bg-muted/50">
+                      <td className="p-3 text-sm">{fmtFecha(f.fecha)}</td>
+                      <td className="p-3 font-mono text-xs">{f.loteFabricacion}</td>
+                      <td className="p-3">{formulas.find(x => x.id === f.formulaId)?.nombre || f.formulaId}</td>
+                      <td className="p-3">{Number(f.cantidadProducidaKg).toLocaleString()}</td>
+                      <td className="p-3 text-sm">{f.destino || "—"}</td>
                     </tr>
                   ))}
+                  {fabricaciones.length === 0 && (
+                    <tr><td colSpan={5} className="p-6 text-center text-sm text-muted-foreground">Sin fabricaciones registradas</td></tr>
+                  )}
                 </tbody>
               </table>
             </CardContent>

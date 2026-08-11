@@ -87,15 +87,13 @@ export const createFabricacionAlimentoSchema = z.object({
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (YYYY-MM-DD)"),
   formulaId: z.string().uuid("Fórmula inválida"),
   cantidadProducidaKg: z.number().positive("Cantidad debe ser positiva"),
-  destinoGalponId: z.string().uuid().optional(),
-  destinoSeccionId: z.string().uuid().optional(),
+  destino: z.string().max(200).optional(),
   loteFabricacion: z.string().min(1, "Lote de fabricación requerido"),
 })
 
 export const updateFabricacionAlimentoSchema = z.object({
   cantidadProducidaKg: z.number().positive().optional(),
-  destinoGalponId: z.string().uuid().optional(),
-  destinoSeccionId: z.string().uuid().optional(),
+  destino: z.string().max(200).optional(),
 })
 
 export const listFabricacionesAlimentoSchema = z.object({

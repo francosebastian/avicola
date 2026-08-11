@@ -6,10 +6,7 @@ import { Button } from "@/components/ui/button"
 
 const lineasGeneticas = [
   { linea: "Hy-Line Brown", picoPostura: "24-26 sem", picoPorcentaje: "94-96%", persistencia: "Alta", huevos: "335-345", pesoHuevo: "62-64g" },
-  { linea: "Lohmann LSL", picoPostura: "24-26 sem", picoPorcentaje: "93-95%", persistencia: "Muy alta", huevos: "340-350", pesoHuevo: "60-62g" },
-  { linea: "ISA Brown", picoPostura: "24-26 sem", picoPorcentaje: "93-95%", persistencia: "Alta", huevos: "330-340", pesoHuevo: "62-65g" },
-  { linea: "Bovans Brown", picoPostura: "25-27 sem", picoPorcentaje: "92-94%", persistencia: "Alta", huevos: "325-335", pesoHuevo: "63-66g" },
-  { linea: "Dekalb White", picoPostura: "23-25 sem", picoPorcentaje: "94-96%", persistencia: "Muy alta", huevos: "345-355", pesoHuevo: "58-60g" },
+  { linea: "Hy-Line W-80", picoPostura: "23-25 sem", picoPorcentaje: "95-97%", persistencia: "Muy alta", huevos: "350-360", pesoHuevo: "58-60g" },
 ]
 
 const usuarios = [

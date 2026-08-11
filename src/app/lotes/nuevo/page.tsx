@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { createLoteSchema } from "@/lib/validations/lotes"
+import { LINEAS_GENETICAS } from "@/lib/constantes"
 
 type Seccion = { id: string; nombre: string; galpon: { nombre: string } }
 
@@ -79,12 +80,7 @@ export default function NuevoLotePage() {
               <label htmlFor="lineaGenetica" className="text-sm font-medium">Línea Genética <span className="text-red-500">*</span></label>
               <select id="lineaGenetica" className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("lineaGenetica")}>
                 <option value="">Seleccionar...</option>
-                <option value="Hy-Line Brown">Hy-Line Brown</option>
-                <option value="Hy-Line W36">Hy-Line W36</option>
-                <option value="Lohmann LSL">Lohmann LSL</option>
-                <option value="Lohmann Brown">Lohmann Brown</option>
-                <option value="ISA Brown">ISA Brown</option>
-                <option value="Bovans White">Bovans White</option>
+                {LINEAS_GENETICAS.map(l => <option key={l} value={l}>{l}</option>)}
               </select>
               {errors.lineaGenetica && <p className="text-sm text-red-600 mt-1">{errors.lineaGenetica.message as string}</p>}
             </div>

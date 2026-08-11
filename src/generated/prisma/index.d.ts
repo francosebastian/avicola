@@ -23176,8 +23176,7 @@ export namespace Prisma {
     fecha: Date | null
     formulaId: string | null
     cantidadProducidaKg: Decimal | null
-    destinoGalponId: string | null
-    destinoSeccionId: string | null
+    destino: string | null
     loteFabricacion: string | null
     createdAt: Date | null
   }
@@ -23187,8 +23186,7 @@ export namespace Prisma {
     fecha: Date | null
     formulaId: string | null
     cantidadProducidaKg: Decimal | null
-    destinoGalponId: string | null
-    destinoSeccionId: string | null
+    destino: string | null
     loteFabricacion: string | null
     createdAt: Date | null
   }
@@ -23198,8 +23196,7 @@ export namespace Prisma {
     fecha: number
     formulaId: number
     cantidadProducidaKg: number
-    destinoGalponId: number
-    destinoSeccionId: number
+    destino: number
     loteFabricacion: number
     createdAt: number
     _all: number
@@ -23219,8 +23216,7 @@ export namespace Prisma {
     fecha?: true
     formulaId?: true
     cantidadProducidaKg?: true
-    destinoGalponId?: true
-    destinoSeccionId?: true
+    destino?: true
     loteFabricacion?: true
     createdAt?: true
   }
@@ -23230,8 +23226,7 @@ export namespace Prisma {
     fecha?: true
     formulaId?: true
     cantidadProducidaKg?: true
-    destinoGalponId?: true
-    destinoSeccionId?: true
+    destino?: true
     loteFabricacion?: true
     createdAt?: true
   }
@@ -23241,8 +23236,7 @@ export namespace Prisma {
     fecha?: true
     formulaId?: true
     cantidadProducidaKg?: true
-    destinoGalponId?: true
-    destinoSeccionId?: true
+    destino?: true
     loteFabricacion?: true
     createdAt?: true
     _all?: true
@@ -23339,8 +23333,7 @@ export namespace Prisma {
     fecha: Date
     formulaId: string
     cantidadProducidaKg: Decimal
-    destinoGalponId: string | null
-    destinoSeccionId: string | null
+    destino: string | null
     loteFabricacion: string
     createdAt: Date
     _count: FabricacionAlimentoCountAggregateOutputType | null
@@ -23369,8 +23362,7 @@ export namespace Prisma {
     fecha?: boolean
     formulaId?: boolean
     cantidadProducidaKg?: boolean
-    destinoGalponId?: boolean
-    destinoSeccionId?: boolean
+    destino?: boolean
     loteFabricacion?: boolean
     createdAt?: boolean
     formula?: boolean | FormulaAlimentoDefaultArgs<ExtArgs>
@@ -23383,8 +23375,7 @@ export namespace Prisma {
     fecha?: boolean
     formulaId?: boolean
     cantidadProducidaKg?: boolean
-    destinoGalponId?: boolean
-    destinoSeccionId?: boolean
+    destino?: boolean
     loteFabricacion?: boolean
     createdAt?: boolean
     formula?: boolean | FormulaAlimentoDefaultArgs<ExtArgs>
@@ -23395,8 +23386,7 @@ export namespace Prisma {
     fecha?: boolean
     formulaId?: boolean
     cantidadProducidaKg?: boolean
-    destinoGalponId?: boolean
-    destinoSeccionId?: boolean
+    destino?: boolean
     loteFabricacion?: boolean
     createdAt?: boolean
     formula?: boolean | FormulaAlimentoDefaultArgs<ExtArgs>
@@ -23407,13 +23397,12 @@ export namespace Prisma {
     fecha?: boolean
     formulaId?: boolean
     cantidadProducidaKg?: boolean
-    destinoGalponId?: boolean
-    destinoSeccionId?: boolean
+    destino?: boolean
     loteFabricacion?: boolean
     createdAt?: boolean
   }
 
-  export type FabricacionAlimentoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fecha" | "formulaId" | "cantidadProducidaKg" | "destinoGalponId" | "destinoSeccionId" | "loteFabricacion" | "createdAt", ExtArgs["result"]["fabricacionAlimento"]>
+  export type FabricacionAlimentoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fecha" | "formulaId" | "cantidadProducidaKg" | "destino" | "loteFabricacion" | "createdAt", ExtArgs["result"]["fabricacionAlimento"]>
   export type FabricacionAlimentoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     formula?: boolean | FormulaAlimentoDefaultArgs<ExtArgs>
     detalle?: boolean | FabricacionAlimento$detalleArgs<ExtArgs>
@@ -23437,8 +23426,7 @@ export namespace Prisma {
       fecha: Date
       formulaId: string
       cantidadProducidaKg: Prisma.Decimal
-      destinoGalponId: string | null
-      destinoSeccionId: string | null
+      destino: string | null
       loteFabricacion: string
       createdAt: Date
     }, ExtArgs["result"]["fabricacionAlimento"]>
@@ -23870,8 +23858,7 @@ export namespace Prisma {
     readonly fecha: FieldRef<"FabricacionAlimento", 'DateTime'>
     readonly formulaId: FieldRef<"FabricacionAlimento", 'String'>
     readonly cantidadProducidaKg: FieldRef<"FabricacionAlimento", 'Decimal'>
-    readonly destinoGalponId: FieldRef<"FabricacionAlimento", 'String'>
-    readonly destinoSeccionId: FieldRef<"FabricacionAlimento", 'String'>
+    readonly destino: FieldRef<"FabricacionAlimento", 'String'>
     readonly loteFabricacion: FieldRef<"FabricacionAlimento", 'String'>
     readonly createdAt: FieldRef<"FabricacionAlimento", 'DateTime'>
   }
@@ -35652,9 +35639,10 @@ export namespace Prisma {
   }
 
   export type RegistroPackingAvgAggregateOutputType = {
-    huevosSucio: number | null
-    huevosRoto: number | null
-    huevosDescarte: number | null
+    huevosRotosKg: Decimal | null
+    cajasDescarteX: number | null
+    cajasTrizados: number | null
+    cajasJumboXxl: number | null
     cajasJumbo: number | null
     cajasSuper: number | null
     cajasExtra: number | null
@@ -35664,9 +35652,10 @@ export namespace Prisma {
   }
 
   export type RegistroPackingSumAggregateOutputType = {
-    huevosSucio: number | null
-    huevosRoto: number | null
-    huevosDescarte: number | null
+    huevosRotosKg: Decimal | null
+    cajasDescarteX: number | null
+    cajasTrizados: number | null
+    cajasJumboXxl: number | null
     cajasJumbo: number | null
     cajasSuper: number | null
     cajasExtra: number | null
@@ -35680,9 +35669,10 @@ export namespace Prisma {
     fecha: Date | null
     loteId: string | null
     seccionId: string | null
-    huevosSucio: number | null
-    huevosRoto: number | null
-    huevosDescarte: number | null
+    huevosRotosKg: Decimal | null
+    cajasDescarteX: number | null
+    cajasTrizados: number | null
+    cajasJumboXxl: number | null
     cajasJumbo: number | null
     cajasSuper: number | null
     cajasExtra: number | null
@@ -35698,9 +35688,10 @@ export namespace Prisma {
     fecha: Date | null
     loteId: string | null
     seccionId: string | null
-    huevosSucio: number | null
-    huevosRoto: number | null
-    huevosDescarte: number | null
+    huevosRotosKg: Decimal | null
+    cajasDescarteX: number | null
+    cajasTrizados: number | null
+    cajasJumboXxl: number | null
     cajasJumbo: number | null
     cajasSuper: number | null
     cajasExtra: number | null
@@ -35716,9 +35707,10 @@ export namespace Prisma {
     fecha: number
     loteId: number
     seccionId: number
-    huevosSucio: number
-    huevosRoto: number
-    huevosDescarte: number
+    huevosRotosKg: number
+    cajasDescarteX: number
+    cajasTrizados: number
+    cajasJumboXxl: number
     cajasJumbo: number
     cajasSuper: number
     cajasExtra: number
@@ -35732,9 +35724,10 @@ export namespace Prisma {
 
 
   export type RegistroPackingAvgAggregateInputType = {
-    huevosSucio?: true
-    huevosRoto?: true
-    huevosDescarte?: true
+    huevosRotosKg?: true
+    cajasDescarteX?: true
+    cajasTrizados?: true
+    cajasJumboXxl?: true
     cajasJumbo?: true
     cajasSuper?: true
     cajasExtra?: true
@@ -35744,9 +35737,10 @@ export namespace Prisma {
   }
 
   export type RegistroPackingSumAggregateInputType = {
-    huevosSucio?: true
-    huevosRoto?: true
-    huevosDescarte?: true
+    huevosRotosKg?: true
+    cajasDescarteX?: true
+    cajasTrizados?: true
+    cajasJumboXxl?: true
     cajasJumbo?: true
     cajasSuper?: true
     cajasExtra?: true
@@ -35760,9 +35754,10 @@ export namespace Prisma {
     fecha?: true
     loteId?: true
     seccionId?: true
-    huevosSucio?: true
-    huevosRoto?: true
-    huevosDescarte?: true
+    huevosRotosKg?: true
+    cajasDescarteX?: true
+    cajasTrizados?: true
+    cajasJumboXxl?: true
     cajasJumbo?: true
     cajasSuper?: true
     cajasExtra?: true
@@ -35778,9 +35773,10 @@ export namespace Prisma {
     fecha?: true
     loteId?: true
     seccionId?: true
-    huevosSucio?: true
-    huevosRoto?: true
-    huevosDescarte?: true
+    huevosRotosKg?: true
+    cajasDescarteX?: true
+    cajasTrizados?: true
+    cajasJumboXxl?: true
     cajasJumbo?: true
     cajasSuper?: true
     cajasExtra?: true
@@ -35796,9 +35792,10 @@ export namespace Prisma {
     fecha?: true
     loteId?: true
     seccionId?: true
-    huevosSucio?: true
-    huevosRoto?: true
-    huevosDescarte?: true
+    huevosRotosKg?: true
+    cajasDescarteX?: true
+    cajasTrizados?: true
+    cajasJumboXxl?: true
     cajasJumbo?: true
     cajasSuper?: true
     cajasExtra?: true
@@ -35901,9 +35898,10 @@ export namespace Prisma {
     fecha: Date
     loteId: string
     seccionId: string
-    huevosSucio: number
-    huevosRoto: number
-    huevosDescarte: number
+    huevosRotosKg: Decimal
+    cajasDescarteX: number
+    cajasTrizados: number
+    cajasJumboXxl: number
     cajasJumbo: number
     cajasSuper: number
     cajasExtra: number
@@ -35938,9 +35936,10 @@ export namespace Prisma {
     fecha?: boolean
     loteId?: boolean
     seccionId?: boolean
-    huevosSucio?: boolean
-    huevosRoto?: boolean
-    huevosDescarte?: boolean
+    huevosRotosKg?: boolean
+    cajasDescarteX?: boolean
+    cajasTrizados?: boolean
+    cajasJumboXxl?: boolean
     cajasJumbo?: boolean
     cajasSuper?: boolean
     cajasExtra?: boolean
@@ -35958,9 +35957,10 @@ export namespace Prisma {
     fecha?: boolean
     loteId?: boolean
     seccionId?: boolean
-    huevosSucio?: boolean
-    huevosRoto?: boolean
-    huevosDescarte?: boolean
+    huevosRotosKg?: boolean
+    cajasDescarteX?: boolean
+    cajasTrizados?: boolean
+    cajasJumboXxl?: boolean
     cajasJumbo?: boolean
     cajasSuper?: boolean
     cajasExtra?: boolean
@@ -35978,9 +35978,10 @@ export namespace Prisma {
     fecha?: boolean
     loteId?: boolean
     seccionId?: boolean
-    huevosSucio?: boolean
-    huevosRoto?: boolean
-    huevosDescarte?: boolean
+    huevosRotosKg?: boolean
+    cajasDescarteX?: boolean
+    cajasTrizados?: boolean
+    cajasJumboXxl?: boolean
     cajasJumbo?: boolean
     cajasSuper?: boolean
     cajasExtra?: boolean
@@ -35998,9 +35999,10 @@ export namespace Prisma {
     fecha?: boolean
     loteId?: boolean
     seccionId?: boolean
-    huevosSucio?: boolean
-    huevosRoto?: boolean
-    huevosDescarte?: boolean
+    huevosRotosKg?: boolean
+    cajasDescarteX?: boolean
+    cajasTrizados?: boolean
+    cajasJumboXxl?: boolean
     cajasJumbo?: boolean
     cajasSuper?: boolean
     cajasExtra?: boolean
@@ -36011,7 +36013,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type RegistroPackingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fecha" | "loteId" | "seccionId" | "huevosSucio" | "huevosRoto" | "huevosDescarte" | "cajasJumbo" | "cajasSuper" | "cajasExtra" | "cajasPrimera" | "cajasSegunda" | "cajasTercera" | "registradoPor" | "createdAt", ExtArgs["result"]["registroPacking"]>
+  export type RegistroPackingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fecha" | "loteId" | "seccionId" | "huevosRotosKg" | "cajasDescarteX" | "cajasTrizados" | "cajasJumboXxl" | "cajasJumbo" | "cajasSuper" | "cajasExtra" | "cajasPrimera" | "cajasSegunda" | "cajasTercera" | "registradoPor" | "createdAt", ExtArgs["result"]["registroPacking"]>
   export type RegistroPackingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     lote?: boolean | LoteDefaultArgs<ExtArgs>
     seccion?: boolean | SeccionDefaultArgs<ExtArgs>
@@ -36036,9 +36038,10 @@ export namespace Prisma {
       fecha: Date
       loteId: string
       seccionId: string
-      huevosSucio: number
-      huevosRoto: number
-      huevosDescarte: number
+      huevosRotosKg: Prisma.Decimal
+      cajasDescarteX: number
+      cajasTrizados: number
+      cajasJumboXxl: number
       cajasJumbo: number
       cajasSuper: number
       cajasExtra: number
@@ -36476,9 +36479,10 @@ export namespace Prisma {
     readonly fecha: FieldRef<"RegistroPacking", 'DateTime'>
     readonly loteId: FieldRef<"RegistroPacking", 'String'>
     readonly seccionId: FieldRef<"RegistroPacking", 'String'>
-    readonly huevosSucio: FieldRef<"RegistroPacking", 'Int'>
-    readonly huevosRoto: FieldRef<"RegistroPacking", 'Int'>
-    readonly huevosDescarte: FieldRef<"RegistroPacking", 'Int'>
+    readonly huevosRotosKg: FieldRef<"RegistroPacking", 'Decimal'>
+    readonly cajasDescarteX: FieldRef<"RegistroPacking", 'Int'>
+    readonly cajasTrizados: FieldRef<"RegistroPacking", 'Int'>
+    readonly cajasJumboXxl: FieldRef<"RegistroPacking", 'Int'>
     readonly cajasJumbo: FieldRef<"RegistroPacking", 'Int'>
     readonly cajasSuper: FieldRef<"RegistroPacking", 'Int'>
     readonly cajasExtra: FieldRef<"RegistroPacking", 'Int'>
@@ -53313,8 +53317,7 @@ export namespace Prisma {
     fecha: 'fecha',
     formulaId: 'formulaId',
     cantidadProducidaKg: 'cantidadProducidaKg',
-    destinoGalponId: 'destinoGalponId',
-    destinoSeccionId: 'destinoSeccionId',
+    destino: 'destino',
     loteFabricacion: 'loteFabricacion',
     createdAt: 'createdAt'
   };
@@ -53484,9 +53487,10 @@ export namespace Prisma {
     fecha: 'fecha',
     loteId: 'loteId',
     seccionId: 'seccionId',
-    huevosSucio: 'huevosSucio',
-    huevosRoto: 'huevosRoto',
-    huevosDescarte: 'huevosDescarte',
+    huevosRotosKg: 'huevosRotosKg',
+    cajasDescarteX: 'cajasDescarteX',
+    cajasTrizados: 'cajasTrizados',
+    cajasJumboXxl: 'cajasJumboXxl',
     cajasJumbo: 'cajasJumbo',
     cajasSuper: 'cajasSuper',
     cajasExtra: 'cajasExtra',
@@ -55158,8 +55162,7 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"FabricacionAlimento"> | Date | string
     formulaId?: StringFilter<"FabricacionAlimento"> | string
     cantidadProducidaKg?: DecimalFilter<"FabricacionAlimento"> | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: StringNullableFilter<"FabricacionAlimento"> | string | null
-    destinoSeccionId?: StringNullableFilter<"FabricacionAlimento"> | string | null
+    destino?: StringNullableFilter<"FabricacionAlimento"> | string | null
     loteFabricacion?: StringFilter<"FabricacionAlimento"> | string
     createdAt?: DateTimeFilter<"FabricacionAlimento"> | Date | string
     formula?: XOR<FormulaAlimentoScalarRelationFilter, FormulaAlimentoWhereInput>
@@ -55171,8 +55174,7 @@ export namespace Prisma {
     fecha?: SortOrder
     formulaId?: SortOrder
     cantidadProducidaKg?: SortOrder
-    destinoGalponId?: SortOrderInput | SortOrder
-    destinoSeccionId?: SortOrderInput | SortOrder
+    destino?: SortOrderInput | SortOrder
     loteFabricacion?: SortOrder
     createdAt?: SortOrder
     formula?: FormulaAlimentoOrderByWithRelationInput
@@ -55187,8 +55189,7 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"FabricacionAlimento"> | Date | string
     formulaId?: StringFilter<"FabricacionAlimento"> | string
     cantidadProducidaKg?: DecimalFilter<"FabricacionAlimento"> | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: StringNullableFilter<"FabricacionAlimento"> | string | null
-    destinoSeccionId?: StringNullableFilter<"FabricacionAlimento"> | string | null
+    destino?: StringNullableFilter<"FabricacionAlimento"> | string | null
     loteFabricacion?: StringFilter<"FabricacionAlimento"> | string
     createdAt?: DateTimeFilter<"FabricacionAlimento"> | Date | string
     formula?: XOR<FormulaAlimentoScalarRelationFilter, FormulaAlimentoWhereInput>
@@ -55200,8 +55201,7 @@ export namespace Prisma {
     fecha?: SortOrder
     formulaId?: SortOrder
     cantidadProducidaKg?: SortOrder
-    destinoGalponId?: SortOrderInput | SortOrder
-    destinoSeccionId?: SortOrderInput | SortOrder
+    destino?: SortOrderInput | SortOrder
     loteFabricacion?: SortOrder
     createdAt?: SortOrder
     _count?: FabricacionAlimentoCountOrderByAggregateInput
@@ -55219,8 +55219,7 @@ export namespace Prisma {
     fecha?: DateTimeWithAggregatesFilter<"FabricacionAlimento"> | Date | string
     formulaId?: StringWithAggregatesFilter<"FabricacionAlimento"> | string
     cantidadProducidaKg?: DecimalWithAggregatesFilter<"FabricacionAlimento"> | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: StringNullableWithAggregatesFilter<"FabricacionAlimento"> | string | null
-    destinoSeccionId?: StringNullableWithAggregatesFilter<"FabricacionAlimento"> | string | null
+    destino?: StringNullableWithAggregatesFilter<"FabricacionAlimento"> | string | null
     loteFabricacion?: StringWithAggregatesFilter<"FabricacionAlimento"> | string
     createdAt?: DateTimeWithAggregatesFilter<"FabricacionAlimento"> | Date | string
   }
@@ -56024,9 +56023,10 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"RegistroPacking"> | Date | string
     loteId?: StringFilter<"RegistroPacking"> | string
     seccionId?: StringFilter<"RegistroPacking"> | string
-    huevosSucio?: IntFilter<"RegistroPacking"> | number
-    huevosRoto?: IntFilter<"RegistroPacking"> | number
-    huevosDescarte?: IntFilter<"RegistroPacking"> | number
+    huevosRotosKg?: DecimalFilter<"RegistroPacking"> | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFilter<"RegistroPacking"> | number
+    cajasTrizados?: IntFilter<"RegistroPacking"> | number
+    cajasJumboXxl?: IntFilter<"RegistroPacking"> | number
     cajasJumbo?: IntFilter<"RegistroPacking"> | number
     cajasSuper?: IntFilter<"RegistroPacking"> | number
     cajasExtra?: IntFilter<"RegistroPacking"> | number
@@ -56044,9 +56044,10 @@ export namespace Prisma {
     fecha?: SortOrder
     loteId?: SortOrder
     seccionId?: SortOrder
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -56068,9 +56069,10 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"RegistroPacking"> | Date | string
     loteId?: StringFilter<"RegistroPacking"> | string
     seccionId?: StringFilter<"RegistroPacking"> | string
-    huevosSucio?: IntFilter<"RegistroPacking"> | number
-    huevosRoto?: IntFilter<"RegistroPacking"> | number
-    huevosDescarte?: IntFilter<"RegistroPacking"> | number
+    huevosRotosKg?: DecimalFilter<"RegistroPacking"> | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFilter<"RegistroPacking"> | number
+    cajasTrizados?: IntFilter<"RegistroPacking"> | number
+    cajasJumboXxl?: IntFilter<"RegistroPacking"> | number
     cajasJumbo?: IntFilter<"RegistroPacking"> | number
     cajasSuper?: IntFilter<"RegistroPacking"> | number
     cajasExtra?: IntFilter<"RegistroPacking"> | number
@@ -56088,9 +56090,10 @@ export namespace Prisma {
     fecha?: SortOrder
     loteId?: SortOrder
     seccionId?: SortOrder
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -56114,9 +56117,10 @@ export namespace Prisma {
     fecha?: DateTimeWithAggregatesFilter<"RegistroPacking"> | Date | string
     loteId?: StringWithAggregatesFilter<"RegistroPacking"> | string
     seccionId?: StringWithAggregatesFilter<"RegistroPacking"> | string
-    huevosSucio?: IntWithAggregatesFilter<"RegistroPacking"> | number
-    huevosRoto?: IntWithAggregatesFilter<"RegistroPacking"> | number
-    huevosDescarte?: IntWithAggregatesFilter<"RegistroPacking"> | number
+    huevosRotosKg?: DecimalWithAggregatesFilter<"RegistroPacking"> | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntWithAggregatesFilter<"RegistroPacking"> | number
+    cajasTrizados?: IntWithAggregatesFilter<"RegistroPacking"> | number
+    cajasJumboXxl?: IntWithAggregatesFilter<"RegistroPacking"> | number
     cajasJumbo?: IntWithAggregatesFilter<"RegistroPacking"> | number
     cajasSuper?: IntWithAggregatesFilter<"RegistroPacking"> | number
     cajasExtra?: IntWithAggregatesFilter<"RegistroPacking"> | number
@@ -58653,8 +58657,7 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
     formula: FormulaAlimentoCreateNestedOneWithoutFabricacionAlimentoInput
@@ -58666,8 +58669,7 @@ export namespace Prisma {
     fecha: Date | string
     formulaId: string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
     detalle?: DetalleFabricacionUncheckedCreateNestedManyWithoutFabricacionInput
@@ -58677,8 +58679,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     formula?: FormulaAlimentoUpdateOneRequiredWithoutFabricacionAlimentoNestedInput
@@ -58690,8 +58691,7 @@ export namespace Prisma {
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     formulaId?: StringFieldUpdateOperationsInput | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     detalle?: DetalleFabricacionUncheckedUpdateManyWithoutFabricacionNestedInput
@@ -58702,8 +58702,7 @@ export namespace Prisma {
     fecha: Date | string
     formulaId: string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
   }
@@ -58712,8 +58711,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -58723,8 +58721,7 @@ export namespace Prisma {
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     formulaId?: StringFieldUpdateOperationsInput | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -59614,9 +59611,10 @@ export namespace Prisma {
   export type RegistroPackingCreateInput = {
     id?: string
     fecha: Date | string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -59634,9 +59632,10 @@ export namespace Prisma {
     fecha: Date | string
     loteId: string
     seccionId: string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -59650,9 +59649,10 @@ export namespace Prisma {
   export type RegistroPackingUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -59670,9 +59670,10 @@ export namespace Prisma {
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     loteId?: StringFieldUpdateOperationsInput | string
     seccionId?: StringFieldUpdateOperationsInput | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -59688,9 +59689,10 @@ export namespace Prisma {
     fecha: Date | string
     loteId: string
     seccionId: string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -59704,9 +59706,10 @@ export namespace Prisma {
   export type RegistroPackingUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -59722,9 +59725,10 @@ export namespace Prisma {
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     loteId?: StringFieldUpdateOperationsInput | string
     seccionId?: StringFieldUpdateOperationsInput | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -62291,8 +62295,7 @@ export namespace Prisma {
     fecha?: SortOrder
     formulaId?: SortOrder
     cantidadProducidaKg?: SortOrder
-    destinoGalponId?: SortOrder
-    destinoSeccionId?: SortOrder
+    destino?: SortOrder
     loteFabricacion?: SortOrder
     createdAt?: SortOrder
   }
@@ -62306,8 +62309,7 @@ export namespace Prisma {
     fecha?: SortOrder
     formulaId?: SortOrder
     cantidadProducidaKg?: SortOrder
-    destinoGalponId?: SortOrder
-    destinoSeccionId?: SortOrder
+    destino?: SortOrder
     loteFabricacion?: SortOrder
     createdAt?: SortOrder
   }
@@ -62317,8 +62319,7 @@ export namespace Prisma {
     fecha?: SortOrder
     formulaId?: SortOrder
     cantidadProducidaKg?: SortOrder
-    destinoGalponId?: SortOrder
-    destinoSeccionId?: SortOrder
+    destino?: SortOrder
     loteFabricacion?: SortOrder
     createdAt?: SortOrder
   }
@@ -62871,9 +62872,10 @@ export namespace Prisma {
     fecha?: SortOrder
     loteId?: SortOrder
     seccionId?: SortOrder
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -62885,9 +62887,10 @@ export namespace Prisma {
   }
 
   export type RegistroPackingAvgOrderByAggregateInput = {
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -62901,9 +62904,10 @@ export namespace Prisma {
     fecha?: SortOrder
     loteId?: SortOrder
     seccionId?: SortOrder
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -62919,9 +62923,10 @@ export namespace Prisma {
     fecha?: SortOrder
     loteId?: SortOrder
     seccionId?: SortOrder
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -62933,9 +62938,10 @@ export namespace Prisma {
   }
 
   export type RegistroPackingSumOrderByAggregateInput = {
-    huevosSucio?: SortOrder
-    huevosRoto?: SortOrder
-    huevosDescarte?: SortOrder
+    huevosRotosKg?: SortOrder
+    cajasDescarteX?: SortOrder
+    cajasTrizados?: SortOrder
+    cajasJumboXxl?: SortOrder
     cajasJumbo?: SortOrder
     cajasSuper?: SortOrder
     cajasExtra?: SortOrder
@@ -66511,9 +66517,10 @@ export namespace Prisma {
   export type RegistroPackingCreateWithoutSeccionInput = {
     id?: string
     fecha: Date | string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -66529,9 +66536,10 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     loteId: string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -66783,9 +66791,10 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"RegistroPacking"> | Date | string
     loteId?: StringFilter<"RegistroPacking"> | string
     seccionId?: StringFilter<"RegistroPacking"> | string
-    huevosSucio?: IntFilter<"RegistroPacking"> | number
-    huevosRoto?: IntFilter<"RegistroPacking"> | number
-    huevosDescarte?: IntFilter<"RegistroPacking"> | number
+    huevosRotosKg?: DecimalFilter<"RegistroPacking"> | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFilter<"RegistroPacking"> | number
+    cajasTrizados?: IntFilter<"RegistroPacking"> | number
+    cajasJumboXxl?: IntFilter<"RegistroPacking"> | number
     cajasJumbo?: IntFilter<"RegistroPacking"> | number
     cajasSuper?: IntFilter<"RegistroPacking"> | number
     cajasExtra?: IntFilter<"RegistroPacking"> | number
@@ -67332,9 +67341,10 @@ export namespace Prisma {
   export type RegistroPackingCreateWithoutLoteInput = {
     id?: string
     fecha: Date | string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -67350,9 +67360,10 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     seccionId: string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -69528,8 +69539,7 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
     detalle?: DetalleFabricacionCreateNestedManyWithoutFabricacionInput
@@ -69539,8 +69549,7 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
     detalle?: DetalleFabricacionUncheckedCreateNestedManyWithoutFabricacionInput
@@ -69596,8 +69605,7 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"FabricacionAlimento"> | Date | string
     formulaId?: StringFilter<"FabricacionAlimento"> | string
     cantidadProducidaKg?: DecimalFilter<"FabricacionAlimento"> | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: StringNullableFilter<"FabricacionAlimento"> | string | null
-    destinoSeccionId?: StringNullableFilter<"FabricacionAlimento"> | string | null
+    destino?: StringNullableFilter<"FabricacionAlimento"> | string | null
     loteFabricacion?: StringFilter<"FabricacionAlimento"> | string
     createdAt?: DateTimeFilter<"FabricacionAlimento"> | Date | string
   }
@@ -69942,8 +69950,7 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
     formula: FormulaAlimentoCreateNestedOneWithoutFabricacionAlimentoInput
@@ -69954,8 +69961,7 @@ export namespace Prisma {
     fecha: Date | string
     formulaId: string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
   }
@@ -69980,8 +69986,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     formula?: FormulaAlimentoUpdateOneRequiredWithoutFabricacionAlimentoNestedInput
@@ -69992,8 +69997,7 @@ export namespace Prisma {
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     formulaId?: StringFieldUpdateOperationsInput | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -72719,9 +72723,10 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     loteId: string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -73001,9 +73006,10 @@ export namespace Prisma {
   export type RegistroPackingUpdateWithoutSeccionInput = {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -73019,9 +73025,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     loteId?: StringFieldUpdateOperationsInput | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -73036,9 +73043,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     loteId?: StringFieldUpdateOperationsInput | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -73232,9 +73240,10 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     seccionId: string
-    huevosSucio?: number
-    huevosRoto?: number
-    huevosDescarte?: number
+    huevosRotosKg?: Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: number
+    cajasTrizados?: number
+    cajasJumboXxl?: number
     cajasJumbo?: number
     cajasSuper?: number
     cajasExtra?: number
@@ -73821,9 +73830,10 @@ export namespace Prisma {
   export type RegistroPackingUpdateWithoutLoteInput = {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -73839,9 +73849,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     seccionId?: StringFieldUpdateOperationsInput | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -73856,9 +73867,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     seccionId?: StringFieldUpdateOperationsInput | string
-    huevosSucio?: IntFieldUpdateOperationsInput | number
-    huevosRoto?: IntFieldUpdateOperationsInput | number
-    huevosDescarte?: IntFieldUpdateOperationsInput | number
+    huevosRotosKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cajasDescarteX?: IntFieldUpdateOperationsInput | number
+    cajasTrizados?: IntFieldUpdateOperationsInput | number
+    cajasJumboXxl?: IntFieldUpdateOperationsInput | number
     cajasJumbo?: IntFieldUpdateOperationsInput | number
     cajasSuper?: IntFieldUpdateOperationsInput | number
     cajasExtra?: IntFieldUpdateOperationsInput | number
@@ -73990,8 +74002,7 @@ export namespace Prisma {
     id?: string
     fecha: Date | string
     cantidadProducidaKg: Decimal | DecimalJsLike | number | string
-    destinoGalponId?: string | null
-    destinoSeccionId?: string | null
+    destino?: string | null
     loteFabricacion: string
     createdAt?: Date | string
   }
@@ -74027,8 +74038,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     detalle?: DetalleFabricacionUpdateManyWithoutFabricacionNestedInput
@@ -74038,8 +74048,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     detalle?: DetalleFabricacionUncheckedUpdateManyWithoutFabricacionNestedInput
@@ -74049,8 +74058,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     cantidadProducidaKg?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    destinoGalponId?: NullableStringFieldUpdateOperationsInput | string | null
-    destinoSeccionId?: NullableStringFieldUpdateOperationsInput | string | null
+    destino?: NullableStringFieldUpdateOperationsInput | string | null
     loteFabricacion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

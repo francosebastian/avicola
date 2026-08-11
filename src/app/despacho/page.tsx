@@ -3,38 +3,81 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createDespachoSchema } from "@/lib/validations/despacho"
+import { z } from "zod"
 
-const formatos: Record<string, number> = {
-  Jumbo: 180, Super: 100, Extra: 180,
-  Primera: 180, Segunda: 180, Tercera: 180,
+const CATEGORY_LABELS: Record<string, string> = {
+  jumbo_xxl: "Jumbo XXL",
+  jumbo: "Jumbo",
+  super: "Súper",
+  extra: "Extra",
+  primera: "Primera",
+  segunda: "Segunda",
+  tercera: "Tercera",
+  descarte_x: "Descarte X",
+  trizados: "Trizados",
 }
 
-const categorias = ["Jumbo", "Super", "Extra", "Primera", "Segunda", "Tercera"]
-
-const despachos = [
-  { fecha: "20 Jul 2026", hora: "10:30", chofer: "Luis González", destino: "Supermercado XYZ — Bodega Central", guia: "GD-2026-07-20-001", items: [{cat:"Super", cajas:50}, {cat:"Extra", cajas:80}, {cat:"Primera", cajas:30}], totalCajas: 160, est: "despachado" },
-  { fecha: "20 Jul 2026", hora: "14:00", chofer: "Pedro Ramírez", destino: "Distribuidora ABC — Renca", guia: "GD-2026-07-20-002", items: [{cat:"Jumbo", cajas:20}, {cat:"Extra", cajas:60}], totalCajas: 80, est: "despachado" },
-  { fecha: "19 Jul 2026", hora: "09:00", chofer: "Mario Soto", destino: "Hotel Gourmet S.A. — Vitacura", guia: "GD-2026-07-19-001", items: [{cat:"Super", cajas:30}, {cat:"Primera", cajas:20}], totalCajas: 50, est: "despachado" },
-  { fecha: "19 Jul 2026", hora: "16:30", chofer: "Luis González", destino: "Supermercado XYZ — Bodega Norte", guia: "GD-2026-07-19-002", items: [{cat:"Extra", cajas:100}], totalCajas: 100, est: "despachado" },
-]
-
+type Formato = { categoria: string; unidadesPorCaja: number; activo: boolean }
+type Stock = { categoria: string; stockCajas: number; stockUnidades: number }
 type DetalleItem = { categoria: string; cantidadCajas: number }
+type BalanceItem = { categoria: string; apertura: number; entradas: number; salidas: number; cierre: number; diferencia: number }
+type DespachoItem = {
+  id: string
+  fecha: string
+  horaSalida: string
+  chofer: string
+  destino: string
+  numeroGuia?: string | null
+  detalle: { categoria: string; cantidadCajas: number; cantidadUnidades?: number | null }[]
+}
 
 export default function DespachoPage() {
-  const router = useRouter()
   const [tab, setTab] = useState<"registro" | "historial" | "balance">("registro")
-  const [detalle, setDetalle] = useState<DetalleItem[]>(categorias.map(c => ({ categoria: c, cantidadCajas: 0 })))
+  const [formatos, setFormatos] = useState<Formato[]>([])
+  const [inventario, setInventario] = useState<Stock[]>([])
+  const [despachos, setDespachos] = useState<DespachoItem[]>([])
+  const [balance, setBalance] = useState<BalanceItem[]>([])
+  const [detalle, setDetalle] = useState<DetalleItem[]>([])
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(createDespachoSchema),
   })
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/packing/formato-cajas?limit=100").then(r => r.json()),
+      fetch("/api/packing/inventario?limit=100").then(r => r.json()),
+    ]).then(([fmt, inv]) => {
+      const activos: Formato[] = (fmt.data || []).filter((f: Formato) => f.activo)
+      setFormatos(activos)
+      setDetalle(activos.map(f => ({ categoria: f.categoria, cantidadCajas: 0 })))
+      setInventario(inv.data || [])
+    }).catch(() => toast.error("Error al cargar datos"))
+  }, [])
+
+  async function loadInventario() {
+    try {
+      const res = await fetch("/api/packing/inventario?limit=100")
+      const json = await res.json()
+      setInventario(json.data || [])
+    } catch {
+      toast.error("Error al cargar inventario")
+    }
+  }
+
+  function uds(categoria: string) {
+    return formatos.find(f => f.categoria === categoria)?.unidadesPorCaja ?? 100
+  }
+
+  function stock(categoria: string) {
+    return inventario.find(i => i.categoria === categoria)?.stockCajas ?? 0
+  }
 
   function updateCajas(categoria: string, value: string) {
     setDetalle(prev => prev.map(d =>
@@ -42,19 +85,22 @@ export default function DespachoPage() {
     ))
   }
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: z.infer<typeof createDespachoSchema>) {
     const detalleValido = detalle.filter(d => d.cantidadCajas > 0)
     if (detalleValido.length === 0) {
       toast.error("Debe agregar al menos un producto con cajas > 0")
       return
     }
+    const sinStock = detalleValido.find(d => d.cantidadCajas > stock(d.categoria))
+    if (sinStock) {
+      toast.error(`Stock insuficiente para ${CATEGORY_LABELS[sinStock.categoria] || sinStock.categoria}`)
+      return
+    }
 
     const body = {
       ...data,
-      detalle: detalleValido.map(d => ({
-        categoria: d.categoria,
-        cantidadCajas: d.cantidadCajas,
-      })),
+      fecha: data.fecha || new Date().toISOString().split("T")[0],
+      detalle: detalleValido,
     }
 
     const res = await fetch("/api/despacho/registro", {
@@ -70,7 +116,37 @@ export default function DespachoPage() {
     }
 
     toast.success("Despacho registrado correctamente")
-    router.refresh()
+    setDetalle(prev => prev.map(d => ({ ...d, cantidadCajas: 0 })))
+    await loadInventario()
+  }
+
+  useEffect(() => {
+    if (tab === "historial") {
+      let cancelled = false
+      fetch("/api/despacho/registro?limit=100")
+        .then(r => r.json())
+        .then(json => { if (!cancelled) setDespachos(json.data || []) })
+        .catch(() => toast.error("Error al cargar historial"))
+      return () => { cancelled = true }
+    }
+    if (tab === "balance") {
+      let cancelled = false
+      fetch("/api/despacho/balance-diario")
+        .then(r => r.json())
+        .then(json => { if (!cancelled) setBalance(json.items || []) })
+        .catch(() => toast.error("Error al cargar balance"))
+      return () => { cancelled = true }
+    }
+  }, [tab])
+
+  function fmtFecha(f: string) {
+    const d = new Date(f)
+    return d.toLocaleDateString("es-CL", { day: "2-digit", month: "short", year: "numeric" })
+  }
+
+  function fmtHora(h: string) {
+    const d = new Date(h)
+    return d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })
   }
 
   return (
@@ -137,31 +213,28 @@ export default function DespachoPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {detalle.map((item) => {
-                      const stock = { Jumbo: 85, Super: 320, Extra: 280, Primera: 150, Segunda: 45, Tercera: 20 }[item.categoria] || 0
-                      return (
-                        <tr key={item.categoria} className="border-b last:border-0 hover:bg-muted/50">
-                          <td className="p-2 font-medium">{item.categoria}</td>
-                          <td className="p-2">{stock} cajas ({(stock * formatos[item.categoria]).toLocaleString()} uds)</td>
-                          <td className="p-2">
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              className="w-24"
-                              value={item.cantidadCajas || ""}
-                              onChange={(e) => updateCajas(item.categoria, e.target.value)}
-                            />
-                          </td>
-                          <td className="p-2 text-sm text-muted-foreground">
-                            {(item.cantidadCajas * formatos[item.categoria]).toLocaleString()} uds
-                          </td>
-                        </tr>
-                      )
-                    })}
+                    {detalle.map((item) => (
+                      <tr key={item.categoria} className="border-b last:border-0 hover:bg-muted/50">
+                        <td className="p-2 font-medium">{CATEGORY_LABELS[item.categoria] || item.categoria}</td>
+                        <td className="p-2">{stock(item.categoria)} cajas ({(stock(item.categoria) * uds(item.categoria)).toLocaleString()} uds)</td>
+                        <td className="p-2">
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            className="w-24"
+                            value={item.cantidadCajas || ""}
+                            onChange={(e) => updateCajas(item.categoria, e.target.value)}
+                          />
+                        </td>
+                        <td className="p-2 text-sm text-muted-foreground">
+                          {(item.cantidadCajas * uds(item.categoria)).toLocaleString()} uds
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
                 <div className="text-xs text-muted-foreground">
-                  Las unidades se calculan automáticamente según el formato de cada categoría (Super: 100 uds/caja, Extra/Primera: 180 uds/caja).
+                  Las unidades se calculan automáticamente según el formato real de cada categoría.
                   Al confirmar, el stock se descuenta automáticamente del inventario de packing.
                 </div>
                 <div className="flex justify-end mt-4 gap-2">
@@ -188,21 +261,24 @@ export default function DespachoPage() {
               <thead>
                 <tr className="border-b text-left text-sm text-muted-foreground">
                   <th className="p-3 font-medium">Fecha</th><th className="p-3 font-medium">Hora</th><th className="p-3 font-medium">Chofer</th>
-                  <th className="p-3 font-medium">Destino</th><th className="p-3 font-medium">N° Guía</th><th className="p-3 font-medium">Cajas</th><th className="p-3 font-medium"></th>
+                  <th className="p-3 font-medium">Destino</th><th className="p-3 font-medium">N° Guía</th><th className="p-3 font-medium">Cajas</th><th className="p-3 font-medium">Unidades</th>
                 </tr>
               </thead>
               <tbody>
-                {despachos.map((d, i) => (
-                  <tr key={i} className="border-b last:border-0 hover:bg-muted/50">
-                    <td className="p-3 text-sm">{d.fecha}</td>
-                    <td className="p-3 text-sm">{d.hora}</td>
+                {despachos.map((d) => (
+                  <tr key={d.id} className="border-b last:border-0 hover:bg-muted/50">
+                    <td className="p-3 text-sm">{fmtFecha(d.fecha)}</td>
+                    <td className="p-3 text-sm">{fmtHora(d.horaSalida)}</td>
                     <td className="p-3 font-medium">{d.chofer}</td>
-                    <td className="p-3 text-sm max-w-[200px] truncate" title={d.destino}>{d.destino}</td>
-                    <td className="p-3 font-mono text-xs">{d.guia}</td>
-                    <td className="p-3">{d.totalCajas}</td>
-                    <td className="p-3"><Button type="button" variant="ghost" size="sm">Ver</Button></td>
+                    <td className="p-3 text-sm max-w-[220px] truncate" title={d.destino}>{d.destino}</td>
+                    <td className="p-3 font-mono text-xs">{d.numeroGuia || "—"}</td>
+                    <td className="p-3">{d.detalle.reduce((s, x) => s + x.cantidadCajas, 0)}</td>
+                    <td className="p-3">{d.detalle.reduce((s, x) => s + (x.cantidadUnidades || 0), 0).toLocaleString()}</td>
                   </tr>
                 ))}
+                {despachos.length === 0 && (
+                  <tr><td colSpan={7} className="p-6 text-center text-sm text-muted-foreground">Sin despachos registrados</td></tr>
+                )}
               </tbody>
             </table>
           </CardContent>
@@ -230,21 +306,14 @@ export default function DespachoPage() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { cat: "Super", apertura: 320, entradas: 36, salidas: 50, cierre: 306 },
-                  { cat: "Extra", apertura: 280, entradas: 25, salidas: 140, cierre: 165 },
-                  { cat: "Primera", apertura: 150, entradas: 12, salidas: 30, cierre: 132 },
-                  { cat: "Jumbo", apertura: 85, entradas: 8, salidas: 20, cierre: 73 },
-                  { cat: "Segunda", apertura: 45, entradas: 3, salidas: 0, cierre: 48 },
-                  { cat: "Tercera", apertura: 20, entradas: 1, salidas: 0, cierre: 21 },
-                ].map((item, i) => (
-                  <tr key={i} className="border-b last:border-0 hover:bg-muted/50">
-                    <td className="p-3 font-medium">{item.cat}</td>
+                {balance.map((item) => (
+                  <tr key={item.categoria} className="border-b last:border-0 hover:bg-muted/50">
+                    <td className="p-3 font-medium">{CATEGORY_LABELS[item.categoria] || item.categoria}</td>
                     <td className="p-3">{item.apertura} cajas</td>
                     <td className="p-3 text-green-700">+{item.entradas}</td>
                     <td className="p-3 text-red-600">-{item.salidas}</td>
                     <td className="p-3 font-medium">{item.cierre} cajas</td>
-                    <td className="p-3">{item.cierre - item.apertura >= 0 ? `+${item.cierre - item.apertura}` : item.cierre - item.apertura}</td>
+                    <td className="p-3">{item.diferencia >= 0 ? `+${item.diferencia}` : item.diferencia}</td>
                   </tr>
                 ))}
               </tbody>
