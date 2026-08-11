@@ -33,15 +33,10 @@ interface LoteFull {
   mortalidadAcumulada: number
   huevosTotales: number
   huevosPorAve: number
+  posturaCurva: Array<{ semana: number; real: number; teorica: number | null }>
+  mortalidadSemanal: Array<{ semana: number; bajas: number }>
   eventos: Array<{ id: string; tipoEvento: string; fecha: string; descripcion: string | null; createdBy: string | null }>
 }
-
-const posturaCurva = [
-  { semana: 18, real: 5, teorica: 5 }, { semana: 20, real: 50, teorica: 48 },
-  { semana: 22, real: 85, teorica: 82 }, { semana: 24, real: 92, teorica: 90 },
-  { semana: 26, real: 93, teorica: 92 }, { semana: 28, real: 91, teorica: 92 },
-  { semana: 30, real: 89, teorica: 91 }, { semana: 32, real: 90, teorica: 90 },
-]
 
 export default function LoteDetailPage() {
   const params = useParams()
@@ -137,35 +132,39 @@ export default function LoteDetailPage() {
         <Card>
           <CardHeader><CardTitle>Curva de Postura</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={posturaCurva}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="semana" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Line type="monotone" dataKey="teorica" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" name="Teórica" />
-                <Line type="monotone" dataKey="real" stroke="#166534" strokeWidth={3} name="Real" dot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            {lote.posturaCurva.length === 0 ? (
+              <p className="p-6 text-center text-sm text-muted-foreground">Sin registros de producción aún.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={lote.posturaCurva}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="semana" />
+                  <YAxis domain={[0, 100]} unit="%" />
+                  <Tooltip formatter={(v) => `${v}%`} />
+                  <Line type="monotone" dataKey="teorica" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" name="Teórica" connectNulls />
+                  <Line type="monotone" dataKey="real" stroke="#166534" strokeWidth={3} name="Real" dot={{ r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader><CardTitle>Mortalidad Semanal</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={[
-                { semana: 18, bajas: 12 }, { semana: 20, bajas: 8 }, { semana: 22, bajas: 5 },
-                { semana: 24, bajas: 4 }, { semana: 26, bajas: 3 }, { semana: 28, bajas: 6 },
-                { semana: 30, bajas: 4 }, { semana: 32, bajas: 3 },
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="semana" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="bajas" fill="#ef4444" radius={[4, 4, 0, 0]} name="Bajas" />
-              </BarChart>
-            </ResponsiveContainer>
+            {lote.mortalidadSemanal.length === 0 ? (
+              <p className="p-6 text-center text-sm text-muted-foreground">Sin registros de mortalidad aún.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={lote.mortalidadSemanal}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="semana" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="bajas" fill="#ef4444" radius={[4, 4, 0, 0]} name="Bajas" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>
