@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
         fechaRecepcion: l.fechaRecepcion,
         edadSemanas: diffWeeks,
         postura,
+        seccionId: l.seccionId,
         galpon: l.seccion?.galpon?.nombre ?? null,
         seccion: l.seccion?.nombre ?? null,
       }

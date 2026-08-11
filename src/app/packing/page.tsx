@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -49,11 +49,37 @@ export default function PackingPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [confirmData, setConfirmData] = useState<Record<string, any>>({})
   const [inventario, setInventario] = useState<any[]>([])
+  const [galponId, setGalponId] = useState("")
+  const [filaId, setFilaId] = useState("")
 
-  const { register, handleSubmit, watch, reset } = useForm<FormData>({
+  const { register, handleSubmit, watch, reset, setValue } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { huevosRotosKg: 0, cajasDescarteX: 0, cajasTrizados: 0 },
   })
+
+  const galpones = useMemo(() => {
+    const map = new Map<string, { id: string; nombre: string }>()
+    for (const s of secciones) {
+      if (s.galponId) map.set(s.galponId, { id: s.galponId, nombre: s.galpon?.nombre })
+    }
+    return [...map.values()].sort((a, b) => a.nombre.localeCompare(b.nombre))
+  }, [secciones])
+
+  const filas = secciones.filter((s: any) => s.galponId === galponId)
+
+  function onGalponChange(id: string) {
+    setGalponId(id)
+    setFilaId("")
+    setValue("seccionId", "" as any)
+    setValue("loteId", "" as any)
+  }
+
+  function onFilaChange(secId: string) {
+    setFilaId(secId)
+    setValue("seccionId", secId)
+    const lote = lotes.find((l: any) => l.seccionId === secId)
+    setValue("loteId", lote?.id || "")
+  }
 
   useEffect(() => {
     Promise.all([
@@ -79,6 +105,10 @@ export default function PackingPage() {
   const totalUnidades = categorias.reduce((s, c) => s + (Number((vals as any)[c.id]) || 0) * c.uds, 0)
 
   function onPreSubmit(data: FormData) {
+    if (!data.seccionId || !lotes.find((l: any) => l.id === data.loteId)) {
+      toast.error("Seleccione galpón y fila con un lote asignado")
+      return
+    }
     const body: Record<string, any> = { ...data }
     for (const k of Object.keys(body)) {
       if (k === "loteId" || k === "seccionId" || k === "fecha") continue
@@ -104,6 +134,11 @@ export default function PackingPage() {
     }
     toast.success("Packing registrado correctamente")
     reset()
+    if (filaId) {
+      setValue("seccionId", filaId)
+      const lote = lotes.find((l: any) => l.seccionId === filaId)
+      setValue("loteId", lote?.id || "")
+    }
     routerRefresh()
   }
 
@@ -137,17 +172,26 @@ export default function PackingPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium">Lote</label>
-                    <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("loteId")}>
+                    <label className="text-sm font-medium">Galpón</label>
+                    <select
+                      className="w-full mt-1 rounded-md border p-2 text-sm bg-background"
+                      value={galponId}
+                      onChange={(e) => onGalponChange(e.target.value)}
+                    >
                       <option value="">Seleccionar...</option>
-                      {lotes.map((l: any) => <option key={l.id} value={l.id}>{l.codigoLote}</option>)}
+                      {galpones.map((g) => <option key={g.id} value={g.id}>{g.nombre}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Sección</label>
-                    <select className="w-full mt-1 rounded-md border p-2 text-sm bg-background" {...register("seccionId")}>
+                    <label className="text-sm font-medium">Fila</label>
+                    <select
+                      className="w-full mt-1 rounded-md border p-2 text-sm bg-background"
+                      value={filaId}
+                      onChange={(e) => onFilaChange(e.target.value)}
+                      disabled={!galponId}
+                    >
                       <option value="">Seleccionar...</option>
-                      {secciones.map((s: any) => <option key={s.id} value={s.id}>{s.galpon?.nombre} — {s.nombre}</option>)}
+                      {filas.map((s: any) => <option key={s.id} value={s.id}>{s.nombre}</option>)}
                     </select>
                   </div>
                 </div>
